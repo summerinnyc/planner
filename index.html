@@ -809,6 +809,16 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     if (n === 0) return '<span class="chip alert">오늘 마감</span>';
     return '<span class="chip' + (n <= 2 ? " alert" : " strong") + '">마감 D-' + n + "</span>";
   }
+  // iPhone/Mac: hand the task to the Shortcuts app; the shortcut "플래너 알림" adds it to Reminders.
+  const IS_APPLE = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+  const SHORTCUT_NAME = "플래너 알림";
+  function remindersURL(it){
+    const w = whenTs(it);
+    const at = new Date(w - (it.remind ? it.remind * 60000 : 0));
+    const when = ymd(at) + " " + pad(at.getHours()) + ":" + pad(at.getMinutes());
+    const payload = JSON.stringify({title: (it.title || "할 일") + (it.remind ? " (" + it.time + ")" : ""), when, notes: it.note || ""});
+    return "shortcuts://run-shortcut?name=" + encodeURIComponent(SHORTCUT_NAME) + "&input=text&text=" + encodeURIComponent(payload);
+  }
   function gcalURL(it){
     if (!it.date) return "";
     let tz = "Asia/Seoul";
@@ -868,6 +878,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
         '<label>알림<select class="sel" data-field="remind"' + (it.time ? "" : " disabled") + ">" + remindOptions(it.remind) + "</select></label>" +
         '<label class="wide">메모<textarea data-field="note">' + esc(it.note) + "</textarea></label>" +
         '<div class="wide links">' +
+          (IS_APPLE && it.date && it.time ? '<a href="' + esc(remindersURL(it)) + '" data-act="to-reminders" class="rem-link">' + (it.remindersAt ? "미리알림에 다시 추가" : "미리알림에 추가") + "</a>" : "") +
           (it.date ? '<a href="' + esc(gcalURL(it)) + '" target="_blank" rel="noopener">구글 캘린더에 추가</a>' : "") +
           (spent > 0 && !running ? '<button type="button" class="mini" data-act="reset-time">기록 시간 지우기</button>' : "") +
         "</div>" +
@@ -1142,6 +1153,9 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       if (inp) { inp.focus(); inp.select(); }
     }
     else if (act === "timer") { cur.timerStart ? pauseTimer(id) : startTimer(id, true); }
+    else if (act === "to-reminders") {
+      setTimeout(() => { const c = items.get(id); if (c) { commit(id, Object.assign({}, c, {remindersAt: Date.now()})); render(); } }, 300);
+    }
     else if (act === "tomorrow") {
       const prev = cur.date || "";
       commit(id, Object.assign({}, cur, {date: addDays(today(), 1)}));
