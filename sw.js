@@ -1,6 +1,6 @@
 // Offline support: keeps the app itself on the device so it opens without internet.
 // Your data is kept separately (in the page's local storage) and synced when online.
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL = "planner-shell-" + VERSION;
 const RUNTIME = "planner-runtime-v1";
 const SHELL_FILES = [
@@ -51,7 +51,7 @@ self.addEventListener("fetch", (e) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin === self.location.origin) { e.respondWith(networkFirst(req)); return; }
-  if (url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com") { e.respondWith(cacheFirst(req)); return; }
+  if (url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com" || url.hostname === "cdn.jsdelivr.net") { e.respondWith(cacheFirst(req)); return; }
   if (url.hostname.endsWith(".supabase.co") && url.pathname.includes("/storage/v1/object/sign/")) { e.respondWith(cacheFirst(req)); return; }
   // Everything else (sync requests) goes straight to the network.
 });
