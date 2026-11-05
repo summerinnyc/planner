@@ -54,7 +54,6 @@
 
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.55}
-body.has-timer{padding-bottom:84px}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px dashed var(--ink);outline-offset:2px}
@@ -207,19 +206,45 @@ li.row.done .pill{border-color:var(--line);color:var(--muted)}
 
 /* toast, timer, modal */
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 16px;font-size:14px;display:flex;gap:14px;align-items:center;max-width:calc(100% - 32px);z-index:30}
-body.has-timer .toast{bottom:92px}
 .toast button{white-space:nowrap;border:0;background:transparent;font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:0;color:inherit}
 .toast.alarm{font-weight:700}
-.timerbar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);width:min(640px, calc(100% - 24px));display:flex;align-items:center;gap:12px;padding:10px 14px;z-index:20;flex-wrap:wrap}
-.tb-info{flex:1 1 160px;min-width:0;display:flex;flex-direction:column;line-height:1.3}
-.tb-label{font-size:11.5px;opacity:.75}
-.tb-title{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tb-time{font-family:var(--font-num);font-size:24px;font-variant-numeric:tabular-nums;line-height:1}
-.tb-sub{display:block;font-size:11.5px;opacity:.75;font-family:var(--font-body)}
-.timerbar select{border:0;border-bottom:1px solid currentColor;background:transparent;font-size:13px;color:inherit}
-.timerbar select option{color:#111}
-.timerbar button{border:1px solid currentColor;background:transparent;color:inherit;padding:3px 12px;font-size:13.5px}
-.timerbar button.go{font-weight:700}
+/* timer: a floating mini player, and a focus sheet with a ring */
+body.has-timer{padding-bottom:84px}
+body.has-timer .toast{bottom:86px}
+.tmini{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:22;display:flex;align-items:center;gap:12px;width:min(440px, calc(100% - 24px));padding:8px 8px 8px 18px;border-radius:999px;background:var(--ink);color:var(--paper);box-shadow:0 14px 30px -14px rgba(0,0,0,.5);cursor:pointer;border:0;text-align:left;font:inherit}
+.tmini .tm-dot{width:8px;height:8px;border-radius:50%;background:#4cd964;flex:0 0 auto;animation:tmpulse 1.6s ease-in-out infinite}
+.tmini.paused .tm-dot{background:#999;animation:none}
+@keyframes tmpulse{50%{opacity:.25}}
+.tmini .tm-title{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.tmini .tm-time{font-family:var(--font-num);font-variant-numeric:tabular-nums;font-size:16px;font-weight:600;letter-spacing:.01em}
+.tmini .tm-btn{flex:0 0 auto;width:36px;height:36px;border-radius:50%;border:0;background:var(--paper);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.tmini .tm-btn svg{width:16px;height:16px;display:block}
+.tsheet{position:fixed;inset:0;z-index:45;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.42);padding:20px}
+.ts-box{position:relative;width:min(420px,100%);background:var(--paper);color:var(--ink);border:1px solid var(--ink);padding:22px 24px 26px;display:flex;flex-direction:column;align-items:center;gap:18px}
+.ts-close{position:absolute;top:10px;right:10px;width:36px;height:36px;border:0;background:transparent;color:var(--muted);border-radius:50%;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.ts-close:hover{background:var(--line);color:var(--ink)}
+.ts-close svg{width:20px;height:20px}
+.ts-title{margin:8px 36px 0;font-size:17px;font-weight:600;text-align:center;line-height:1.4;overflow-wrap:anywhere;word-break:keep-all}
+.ts-ring{position:relative;width:240px;height:240px}
+.ts-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ts-ring circle{fill:none;stroke-width:6}
+.ts-ring .track{stroke:var(--line)}
+.ts-ring .prog{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .9s linear}
+.ts-ring.over .prog{stroke:var(--alert)}
+.ts-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.ts-time{font-family:var(--font-num);font-variant-numeric:tabular-nums;font-size:52px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.ts-sub{font-size:13px;color:var(--muted)}
+.ts-goals{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.ts-goals button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:5px 13px;font-size:13.5px;color:var(--muted);cursor:pointer}
+.ts-goals button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper);font-weight:600}
+.ts-actions{display:flex;align-items:center;justify-content:center;gap:22px;width:100%}
+.ts-actions button{display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font:inherit}
+.ts-play{width:68px;height:68px;border-radius:50%;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:0}
+.ts-play svg{width:26px;height:26px}
+.ts-done{height:52px;padding:0 26px;border-radius:999px;border:0;background:var(--ink);color:var(--paper);font-weight:700;font-size:15px;gap:6px}
+.ts-done svg{width:18px;height:18px}
+.ts-stop{height:52px;padding:0 6px;border:0;background:transparent;color:var(--muted);font-size:14px}
+.ts-stop:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .modal{position:fixed;inset:0;background:rgba(20,18,15,.38);display:flex;align-items:flex-start;justify-content:center;padding:60px 16px;z-index:40;overflow-y:auto}
 .modal-box{width:min(440px,100%);background:var(--paper);color:var(--ink);padding:20px 20px 16px;display:flex;flex-direction:column;gap:14px}
 .modal-box h3{margin:0;font-weight:400}
@@ -261,8 +286,7 @@ input[type="color"]::-moz-color-swatch{border:0;border-radius:50%}
 [data-skin="mono"] .done-title{color:var(--muted);text-decoration:line-through}
 [data-skin="mono"] .empty{font-size:14px}
 [data-skin="mono"] .banner .note-sticky{border:1px solid var(--ink);background:transparent}
-[data-skin="mono"] .toast,[data-skin="mono"] .timerbar{background:var(--ink);color:var(--paper)}
-[data-skin="mono"] .timerbar button.go{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+[data-skin="mono"] .toast{background:var(--ink);color:var(--paper)}
 [data-skin="mono"] .modal-box{border:1px solid var(--ink)}
 [data-skin="mono"] .modal-box h3{font-size:17px;font-weight:700}
 
@@ -285,7 +309,6 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   }
   html,body{-webkit-text-size-adjust:100%;font-size:16px;letter-spacing:-.01em}
   body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
-  body.has-timer{padding-bottom:calc(150px + env(safe-area-inset-bottom))}
   input,select,textarea{font-size:16px!important}
 
   .cover{height:170px}
@@ -386,15 +409,15 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   html,body{overflow-x:hidden}
   .detail .wide{grid-column:1 / -1}
 
-  .timerbar{bottom:calc(72px + env(safe-area-inset-bottom));width:calc(100% - 20px);border-radius:16px;padding:12px 14px;display:grid;grid-template-columns:1fr auto auto;grid-template-areas:"info time time" "goal pause done";gap:10px 8px;align-items:center}
-  .tb-info{grid-area:info}
-  .tb-time{grid-area:time;justify-self:end;font-size:30px;font-weight:600}
-  #tbGoal{grid-area:goal;justify-self:start;font-size:14px!important}
-  #tbPause{grid-area:pause}
-  #tbDone{grid-area:done}
-  .timerbar button{border-radius:999px;padding:7px 16px;font-size:14px}
   .toast{bottom:calc(84px + env(safe-area-inset-bottom));border-radius:12px}
-  body.has-timer .toast{bottom:calc(170px + env(safe-area-inset-bottom))}
+  body.has-timer{padding-bottom:calc(140px + env(safe-area-inset-bottom))}
+  body.has-timer .toast{bottom:calc(140px + env(safe-area-inset-bottom))}
+  .tmini{bottom:calc(74px + env(safe-area-inset-bottom));width:calc(100% - 20px)}
+  .tsheet{padding:0;align-items:flex-end;background:rgba(10,10,10,.3)}
+  .ts-box{width:100%;min-height:calc(100% - 40px);border:0;border-radius:22px 22px 0 0;padding:18px 22px calc(30px + env(safe-area-inset-bottom));justify-content:center;gap:24px}
+  .ts-box::before{content:"";position:absolute;top:8px;left:50%;width:38px;height:5px;margin-left:-19px;border-radius:3px;background:var(--line)}
+  .ts-ring{width:min(280px, 72vw);height:min(280px, 72vw)}
+  .ts-time{font-size:58px}
   .modal{padding:40px 14px}
   .modal-box{border-radius:16px}
 }
@@ -472,14 +495,30 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
 
 <datalist id="none"></datalist>
 
-<div class="timerbar" id="timerbar" hidden>
-  <div class="tb-info"><span class="tb-label" id="tbLabel">진행 중</span><span class="tb-title" id="tbTitle"></span></div>
-  <span class="tb-time" id="tbTime">0:00</span>
-  <select id="tbGoal" aria-label="목표 시간">
-    <option value="">목표 없음</option><option value="25">목표 25분</option><option value="50">목표 50분</option><option value="90">목표 90분</option>
-  </select>
-  <button type="button" id="tbPause">일시정지</button>
-  <button type="button" class="go" id="tbDone">완료</button>
+<button type="button" class="tmini" id="tmini" hidden aria-label="타이머 열기">
+  <span class="tm-dot" aria-hidden="true"></span>
+  <span class="tm-title" id="tmTitle"></span>
+  <span class="tm-time" id="tmTime">0:00</span>
+  <span class="tm-btn" id="tmToggle" role="button" aria-label="일시정지"></span>
+</button>
+
+<div class="tsheet" id="tsheet" hidden>
+  <div class="ts-box" role="dialog" aria-modal="true" aria-labelledby="tsTitle">
+    <button type="button" class="ts-close" id="tsClose" aria-label="작게 보기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+    <p class="ts-title" id="tsTitle"></p>
+    <div class="ts-ring" id="tsRing">
+      <svg viewBox="0 0 240 240" aria-hidden="true"><circle class="track" cx="120" cy="120" r="110"/><circle class="prog" id="tsProg" cx="120" cy="120" r="110" stroke-dasharray="691.15" stroke-dashoffset="691.15"/></svg>
+      <div class="ts-center"><span class="ts-time" id="tsTime">0:00</span><span class="ts-sub" id="tsSub"></span></div>
+    </div>
+    <div class="ts-goals" id="tsGoals" role="group" aria-label="목표 시간">
+      <button type="button" data-goal="">목표 없음</button><button type="button" data-goal="25">25분</button><button type="button" data-goal="50">50분</button><button type="button" data-goal="90">90분</button>
+    </div>
+    <div class="ts-actions">
+      <button type="button" class="ts-stop" id="tsStop">그만하기</button>
+      <button type="button" class="ts-play" id="tsToggle" aria-label="일시정지"></button>
+      <button type="button" class="ts-done" id="tsDone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>완료</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal" id="catModal" hidden>
@@ -523,6 +562,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   const REMIND = [["", "없음"], ["0", "정각"], ["5", "5분 전"], ["10", "10분 전"], ["30", "30분 전"], ["60", "1시간 전"], ["1440", "하루 전"]];
   const TRASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>';
   const OLD_PALETTE = ["#e0a526", "#4f9a6a", "#d26a7a", "#7d6bc4", "#3f86c2", "#c9763a", "#2f8f8f", "#b5524a", "#5a6fa8", "#8a8a8a"];
+  const TMR_SVG = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h13"/><path d="m12 6 6 6-6 6"/><path d="M21 5v14"/></svg>';
   const PLAY_SVG = '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
   const PAUSE_SVG = '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>';
   const MORE_SVG = '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>';
@@ -798,10 +838,13 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     if (overdue) chips += '<span class="chip alert late">' + diffDays(t, it.date) + "일 지남</span>";
     chips += dueChip(it);
     if (running) chips += '<span class="chip strong">진행 중</span>';
+    else if (it.timerActive && !it.done) chips += '<span class="chip strong">일시정지 · ' + fmtMin(spent) + "</span>";
     else if (spent > 0) chips += '<span class="chip">' + (it.done ? "걸린 시간 " : "누적 ") + fmtMin(spent) + "</span>";
     if (cat) chips += '<span class="cat" style="--cat:' + esc(cat.color) + '"><span class="dot"></span>' + esc(cat.name) + "</span>";
 
     const tLabel = running ? "일시정지" : (spent > 0 ? "이어서" : "시작");
+    const tmr = addDays(today(), 1);
+    const tomorrowBtn = !it.done && (!it.date || it.date < tmr) ? '<button type="button" class="mini always tmr" data-act="tomorrow" aria-label="내일 하기" title="내일 하기">' + TMR_SVG + '<span class="lbl">내일 하기</span></button>' : "";
     const timerBtn = it.done ? "" : '<button type="button" class="tbtn' + (running ? " on" : "") + '" data-act="timer" aria-label="타이머 ' + tLabel + '">' +
       (running ? PAUSE_SVG : PLAY_SVG) + '<span class="lbl">' + tLabel + "</span></button>";
     let pill = "";
@@ -833,7 +876,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       (manual ? '<button type="button" class="handle" aria-label="끌어서 순서 바꾸기" title="끌어서 순서 바꾸기">⋮⋮</button>' : "") +
       '<label class="check"><input type="checkbox" data-field="done"' + (it.done ? " checked" : "") + ' aria-label="완료 표시"><span class="box"></span></label>' +
       '<div class="body">' +
-        '<div class="line1">' + pill + title + '<div class="acts">' + timerBtn +
+        '<div class="line1">' + pill + title + '<div class="acts">' + tomorrowBtn + timerBtn +
           '<button type="button" class="mini always more" data-act="detail" aria-label="' + (isOpen ? "닫기" : "자세히") + '" aria-expanded="' + isOpen + '">' + MORE_SVG + '<span class="lbl">' + (isOpen ? "닫기" : "자세히") + "</span></button>" +
           '<button type="button" class="icon-btn" data-act="del" aria-label="삭제" title="휴지통으로">' + TRASH_SVG + "</button></div></div>" +
         (chips ? '<div class="meta">' + chips + "</div>" : "") +
@@ -1063,6 +1106,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     if (f === "done") {
       const now = Date.now();
       if (e.target.checked && next.timerStart) { next.spent = (next.spent || 0) + now - next.timerStart; next.timerStart = null; }
+      if (e.target.checked) next.timerActive = false;
       next.done = e.target.checked; next.doneAt = e.target.checked ? now : null;
     } else if (f === "categoryId") {
       if (v === "__new") { e.target.value = cur.categoryId || ""; openCatModal(id); return; }
@@ -1097,10 +1141,16 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       const inp = document.querySelector('#content [data-id="' + CSS.escape(id) + '"] .pill-input');
       if (inp) { inp.focus(); inp.select(); }
     }
-    else if (act === "timer") { cur.timerStart ? pauseTimer(id) : startTimer(id); }
+    else if (act === "timer") { cur.timerStart ? pauseTimer(id) : startTimer(id, true); }
+    else if (act === "tomorrow") {
+      const prev = cur.date || "";
+      commit(id, Object.assign({}, cur, {date: addDays(today(), 1)}));
+      render();
+      showToast("내일로 옮겼어요", "되돌리기", () => { const c = items.get(id); if (c) { commit(id, Object.assign({}, c, {date: prev})); render(); } });
+    }
     else if (act === "reset-time") { commit(id, Object.assign({}, cur, {spent: 0})); render(); }
     else if (act === "del") {
-      if (cur.timerStart) pauseTimer(id);
+      if (cur.timerStart || cur.timerActive) stopTimer(id);
       commit(id, Object.assign({}, items.get(id), {deleted: true})); openSet.delete(id); render();
       showToast("삭제됨", "되돌리기", () => { const c = items.get(id); if (c) { commit(id, Object.assign({}, c, {deleted: false})); render(); } });
     }
@@ -1176,17 +1226,28 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   content.addEventListener("pointercancel", endDrag);
 
   // ================= timer =================
-  function runningItem(){
+  // A task's timer session stays open (timerActive) while paused, until it is finished or stopped.
+  function activeItem(){
     let best = null;
-    for (const [id, d] of items) if (d.timerStart && !d.deleted && !d.done && (!best || d.timerStart > best.timerStart)) best = Object.assign({id}, d);
+    for (const [id, d] of items) {
+      if (d.deleted || d.done || !(d.timerActive || d.timerStart)) continue;
+      const k = d.timerStart || d.timerActiveAt || 0;
+      if (!best || k > best.k) best = Object.assign({id, k}, d);
+    }
     return best;
   }
-  function startTimer(id){
+  const runningItem = () => { const a = activeItem(); return a && a.timerStart ? a : null; };
+  let sheetOpen = false;
+  function startTimer(id, openSheet){
     const now = Date.now();
-    for (const [oid, d] of items) if (oid !== id && d.timerStart) commit(oid, Object.assign({}, d, {spent: (d.spent || 0) + now - d.timerStart, timerStart: null}));
+    for (const [oid, d] of items) {
+      if (oid === id || !(d.timerStart || d.timerActive)) continue;
+      commit(oid, Object.assign({}, d, {spent: (d.spent || 0) + (d.timerStart ? now - d.timerStart : 0), timerStart: null, timerActive: false}));
+    }
     const d = items.get(id);
-    commit(id, Object.assign({}, d, {timerStart: now}));
+    commit(id, Object.assign({}, d, {timerStart: now, timerActive: true, timerActiveAt: now}));
     unlockAudio();
+    if (openSheet) sheetOpen = true;
     render();
   }
   function pauseTimer(id){
@@ -1194,43 +1255,72 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     commit(id, Object.assign({}, d, {spent: (d.spent || 0) + Date.now() - d.timerStart, timerStart: null}));
     render();
   }
+  function stopTimer(id){
+    const d = items.get(id); if (!d) return;
+    commit(id, Object.assign({}, d, {spent: (d.spent || 0) + (d.timerStart ? Date.now() - d.timerStart : 0), timerStart: null, timerActive: false}));
+    sheetOpen = false;
+    render();
+  }
   function finishTimer(id){
     const d = items.get(id); if (!d) return;
     const now = Date.now();
     const spent = (d.spent || 0) + (d.timerStart ? now - d.timerStart : 0);
-    commit(id, Object.assign({}, d, {spent, timerStart: null, done: true, doneAt: now}));
+    commit(id, Object.assign({}, d, {spent, timerStart: null, timerActive: false, done: true, doneAt: now}));
+    sheetOpen = false;
     render();
     showToast("완료 · " + fmtMin(spent));
   }
+  const RING = 2 * Math.PI * 110;
   function updateTimerBar(){
-    const r = runningItem();
-    const bar = $("#timerbar");
-    document.body.classList.toggle("has-timer", !!r);
-    if (!r) { bar.hidden = true; return; }
-    bar.hidden = false;
-    bar.dataset.id = r.id;
-    $("#tbTitle").textContent = r.title || "(제목 없음)";
-    const el = elapsed(r);
-    const goal = r.timerGoal ? r.timerGoal * 60000 : 0;
-    if (goal) {
-      const left = goal - el;
-      $("#tbTime").innerHTML = (left >= 0 ? fmtDur(left) : "+" + fmtDur(-left)) + '<span class="tb-sub">' + (left >= 0 ? "남음 · 누적 " : "목표 초과 · 누적 ") + fmtDur(el) + "</span>";
-      if (left < 0) {
-        const key = r.id + "|goal|" + r.timerGoal + "|" + r.timerStart;
-        if (!fired[key]) { fired[key] = Date.now(); lsSet(FIRED_KEY, fired); alertUser("목표 " + r.timerGoal + "분이 지났어요", r.title); }
-      }
-    } else {
-      $("#tbTime").textContent = fmtDur(el);
+    const a = activeItem();
+    const mini = $("#tmini"), sheet = $("#tsheet");
+    document.body.classList.toggle("has-timer", !!a);
+    if (!a) { mini.hidden = true; sheet.hidden = true; sheetOpen = false; return; }
+    const running = !!a.timerStart;
+    const el = elapsed(a);
+    const goal = a.timerGoal ? a.timerGoal * 60000 : 0;
+    const left = goal ? goal - el : 0;
+    const big = goal ? (left >= 0 ? fmtDur(left) : "+" + fmtDur(-left)) : fmtDur(el);
+    mini.hidden = sheetOpen;
+    mini.dataset.id = a.id;
+    mini.classList.toggle("paused", !running);
+    $("#tmTitle").textContent = a.title || "(제목 없음)";
+    $("#tmTime").textContent = big;
+    const tg = $("#tmToggle");
+    const want = running ? "pause" : "play";
+    if (tg.dataset.state !== want) { tg.dataset.state = want; tg.innerHTML = running ? PAUSE_SVG.replace('class="ico"', "") : PLAY_SVG.replace('class="ico"', ""); tg.setAttribute("aria-label", running ? "일시정지" : "계속"); }
+    sheet.hidden = !sheetOpen;
+    if (sheetOpen) {
+      $("#tsTitle").textContent = a.title || "(제목 없음)";
+      $("#tsTime").textContent = big;
+      $("#tsSub").textContent = (running ? "" : "일시정지 · ") + (goal ? (left >= 0 ? "남은 시간" : "목표 초과") + " · 누적 " + fmtDur(el) : "누적 시간");
+      const frac = goal ? Math.min(1, el / goal) : (el % 3600000) / 3600000;
+      $("#tsProg").style.strokeDashoffset = String(RING * (1 - frac));
+      $("#tsRing").classList.toggle("over", goal > 0 && left < 0);
+      const pl = $("#tsToggle");
+      if (pl.dataset.state !== want) { pl.dataset.state = want; pl.innerHTML = running ? PAUSE_SVG.replace('class="ico"', "") : PLAY_SVG.replace('class="ico"', ""); pl.setAttribute("aria-label", running ? "일시정지" : "계속"); }
+      document.querySelectorAll("#tsGoals [data-goal]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.goal === (a.timerGoal ? String(a.timerGoal) : ""))));
     }
-    $("#tbLabel").textContent = "진행 중";
-    const g = $("#tbGoal");
-    if (document.activeElement !== g) g.value = r.timerGoal ? String(r.timerGoal) : "";
+    if (goal && left < 0 && running) {
+      const key = a.id + "|goal|" + a.timerGoal + "|" + a.timerStart;
+      if (!fired[key]) { fired[key] = Date.now(); lsSet(FIRED_KEY, fired); alertUser("목표 " + a.timerGoal + "분 끝", a.title); }
+    }
   }
-  $("#tbPause").addEventListener("click", () => { const id = $("#timerbar").dataset.id; if (id) pauseTimer(id); });
-  $("#tbDone").addEventListener("click", () => { const id = $("#timerbar").dataset.id; if (id) finishTimer(id); });
-  $("#tbGoal").addEventListener("change", (e) => {
-    const id = $("#timerbar").dataset.id; const d = items.get(id); if (!d) return;
-    commit(id, Object.assign({}, d, {timerGoal: e.target.value ? Number(e.target.value) : null}));
+  const curTimerId = () => { const a = activeItem(); return a ? a.id : null; };
+  function toggleTimer(){ const a = activeItem(); if (!a) return; a.timerStart ? pauseTimer(a.id) : startTimer(a.id); }
+  $("#tmini").addEventListener("click", (e) => {
+    if (e.target.closest("#tmToggle")) { e.stopPropagation(); toggleTimer(); return; }
+    sheetOpen = true; updateTimerBar();
+  });
+  $("#tsClose").addEventListener("click", () => { sheetOpen = false; updateTimerBar(); });
+  $("#tsheet").addEventListener("click", (e) => { if (e.target.id === "tsheet") { sheetOpen = false; updateTimerBar(); } });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && sheetOpen) { sheetOpen = false; updateTimerBar(); } });
+  $("#tsToggle").addEventListener("click", toggleTimer);
+  $("#tsDone").addEventListener("click", () => { const id = curTimerId(); if (id) finishTimer(id); });
+  $("#tsStop").addEventListener("click", () => { const id = curTimerId(); if (id) stopTimer(id); });
+  $("#tsGoals").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-goal]"); const id = curTimerId(); if (!b || !id) return;
+    commit(id, Object.assign({}, items.get(id), {timerGoal: b.dataset.goal ? Number(b.dataset.goal) : null}));
     updateTimerBar();
   });
 
@@ -1690,7 +1780,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     syncNewRemind();
     syncAlarmBtn();
     render();
-    setInterval(() => { if (!document.hidden || runningItem()) updateTimerBar(); }, 1000);
+    setInterval(() => { if (!document.hidden) updateTimerBar(); }, 1000);
     setInterval(checkReminders, 10000);
     setTimeout(checkReminders, 1500);
     if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {});
