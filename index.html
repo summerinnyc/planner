@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="ko" data-skin="mono">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Summer 플래너</title>
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="플래너">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: index column at left, one working sheet at right, a timer strip pinned to the bottom while a task runs.
+   Black on white with thin rules; follows dark mode. Category colors are the only hue. */
+:root{
+  --bg:#e9e6df;
+  --paper:#fcfbf8;
+  --ink:#24211d;
+  --muted:#7d786f;
+  --line:#d9d4c9;
+  --hl:#ffe55e;
+  --alert:#c4453b;
+  --sticky:#fff1a6;
+  --font-display:"Nanum Pen Script", "Segoe Print", cursive;
+  --font-body:"Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-num:"Gowun Dodum", "Apple SD Gothic Neo", sans-serif;
+  color-scheme: light;
+}
+:root[data-skin="mono"]{
+  --bg:#ffffff; --paper:#ffffff; --ink:#111111; --muted:#6c6c6c; --line:#e3e3e3; --hl:#111111; --alert:#d0352b; --sticky:#111111; --cover-empty:#f4f4f4;
+  --font-display:"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-body:"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-num:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="mono"]:not([data-theme="light"]){
+    --bg:#0f0f0f; --paper:#0f0f0f; --ink:#f0f0f0; --muted:#9b9b9b; --line:#2a2a2a; --hl:#f0f0f0; --alert:#ff6d61; --sticky:#f0f0f0; --cover-empty:#181818;
+    color-scheme: dark;
+  }
+}
+:root[data-skin="mono"][data-theme="dark"]{
+  --bg:#0f0f0f; --paper:#0f0f0f; --ink:#f0f0f0; --muted:#9b9b9b; --line:#2a2a2a; --hl:#f0f0f0; --alert:#ff6d61; --sticky:#f0f0f0; --cover-empty:#181818;
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.55}
+body.has-timer{padding-bottom:84px}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px dashed var(--ink);outline-offset:2px}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:.85}
+[hidden]{display:none!important}
+
+.cover{position:relative;height:clamp(150px, 22vw, 250px);background:var(--cover-empty);overflow:hidden}
+.cover.empty{height:110px}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;user-select:none;-webkit-user-drag:none}
+.cover.busy img{opacity:.55}
+.cover.moving img{cursor:grab;touch-action:none}
+.cover.moving img:active{cursor:grabbing}
+.cover-tools{position:absolute;right:max(16px, calc((100% - 1020px) / 2 + 20px));bottom:12px;display:flex;gap:6px}
+.cover-tools button,.cover-tools label{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;border-radius:50%;background:rgba(17,17,17,.55);color:#fff;cursor:pointer;padding:0}
+.cover-tools button:hover,.cover-tools label:hover{background:rgba(17,17,17,.8)}
+.cover.empty .cover-tools button,.cover.empty .cover-tools label{background:transparent;color:var(--muted);border:1px dashed var(--muted)}
+.cover.empty .cover-tools label:hover{color:var(--ink);border-color:var(--ink)}
+.cover-tools svg{width:16px;height:16px}
+.cover-tools input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.cover-tools label:focus-within{outline:2px dashed var(--ink);outline-offset:2px}
+.cover.moving .cover-tools .move{background:#fff;color:#111}
+.app{max-width:1020px;margin:0 auto;padding:24px 20px 56px;display:grid;grid-template-columns:190px 1fr;gap:24px;align-items:start}
+
+/* ---------- index column ---------- */
+aside{position:sticky;top:20px;display:flex;flex-direction:column;gap:18px}
+.brand{margin:4px 0 0;line-height:1}
+nav.views{display:flex;flex-direction:column;gap:2px}
+nav.views button,.catlist button{display:flex;align-items:baseline;gap:8px;border:0;background:transparent;text-align:left;color:var(--muted)}
+nav.views button:hover,.catlist button:hover{color:var(--ink)}
+nav.views button[aria-current="true"],.catlist button[aria-current="true"]{color:var(--ink)}
+.n{font-family:var(--font-num);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+nav.views .sep{height:0;border-top:1px dashed var(--line);margin:8px 4px}
+.cats{display:flex;flex-direction:column;gap:6px}
+.cats-head{white-space:nowrap;display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--muted)}
+.catlist{display:flex;flex-direction:column;gap:2px}
+.catlist button{padding:3px 4px;font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--cat,transparent);display:inline-block;flex:0 0 auto;transform:translateY(-1px)}
+.dot.none{border:1px dashed var(--muted)}
+.rail-foot{display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:var(--muted);line-height:1.6}
+.linkbtn{align-self:flex-start;border:0;background:transparent;padding:0;font-size:13px;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- sheet ---------- */
+.sheet{position:relative;min-width:0}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.dayhead{display:flex;align-items:flex-end;gap:10px;line-height:.9}
+.head-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block}
+.status.ok i{background:#5d8b5f}
+.status.warn i{background:#c98a1a}
+.status.bad i{background:var(--alert)}
+.status.bad{color:var(--alert)}
+.alarm-btn{border:0;background:transparent;padding:0;font-size:12.5px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.alarm-btn.on{text-decoration:none;color:var(--ink)}
+
+h2.view{margin:18px 0 6px;font-weight:400;line-height:1.1}
+
+/* add form */
+form.add{display:flex;flex-direction:column;gap:10px;margin:4px 0 18px}
+.add-line{display:flex;align-items:center;gap:8px}
+.catpick{display:flex;flex-wrap:wrap;gap:6px}
+.catpick button{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;padding:3px 10px;font-size:13px;color:var(--muted)}
+.catpick button:hover{border-color:var(--ink);color:var(--ink)}
+.catpick button{border-radius:999px}
+.catpick button[aria-pressed="true"]{border-color:var(--ink);color:var(--ink);font-weight:700}
+.catpick button[data-pick]:not([data-pick=""]):not(.add-cat)[aria-pressed="true"]{background:var(--cat)}
+.catpick button[aria-pressed="true"] .dot{display:none}
+.catpick button[aria-pressed="true"][data-pick]:not([data-pick=""]){color:#1d1d1d}
+.catpick .add-cat{border-style:dashed;padding:3px 11px}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:0;background:transparent;color:var(--muted);padding:0}
+.icon-btn:hover{color:var(--alert)}
+.icon-btn svg{width:16px;height:16px}
+.title-in{flex:1;border:0;border-bottom:1.5px solid var(--ink);background:transparent;padding:6px 2px;font-size:17px;outline:none;min-width:0}
+.add-meta{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:13px}
+.fld{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:12.5px}
+.quick{display:inline-flex;gap:10px}
+.quick button{border:0;background:transparent;padding:0 2px;font-size:13.5px;color:var(--muted)}
+input[type="date"],input[type="time"],select.sel{border:0;border-bottom:1px dotted var(--muted);background:transparent;padding:1px 2px;font-size:13px;color:var(--ink);font-family:var(--font-num);border-radius:0}
+select.sel{font-family:var(--font-body);padding-right:4px}
+.primary{border:1.5px solid var(--ink);background:transparent;padding:0 14px}
+
+.listbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:2px}
+.listbar label{display:inline-flex;align-items:center;gap:6px}
+
+/* list */
+section.group{margin-top:14px}
+section.group h3{margin:0 0 2px;font-weight:400;display:flex;align-items:baseline;gap:8px}
+section.group.late h3{color:var(--alert)}
+ul.list{list-style:none;margin:0;padding:0}
+li.row{display:grid;grid-template-columns:26px 1fr;gap:6px;align-items:start;padding:5px 0}
+li.row.has-handle{grid-template-columns:20px 26px 1fr}
+li.row.dragging{opacity:.55}
+.handle{border:0;background:transparent;color:var(--muted);height:32px;padding:0;cursor:grab;touch-action:none;font-size:14px;letter-spacing:-3px;user-select:none}
+.handle:active{cursor:grabbing}
+.check{position:relative;display:flex;align-items:center;justify-content:center;height:32px;cursor:pointer}
+.check input{position:absolute;opacity:0;width:22px;height:22px;margin:0;cursor:pointer}
+.check .box{width:17px;height:17px;border:1.6px solid var(--ink);position:relative;background:var(--paper)}
+.check input:focus-visible + .box{outline:2px dashed var(--ink);outline-offset:3px}
+.body{min-width:0;display:flex;flex-direction:column;gap:2px}
+.line1{display:flex;align-items:center;gap:8px;min-width:0}
+.title{flex:1;min-width:0;border:0;border-bottom:1px solid transparent;background:transparent;padding:5px 2px 3px;font-size:16px;outline:none}
+.title:focus{border-bottom-color:var(--ink)}
+.done-title{flex:1;min-width:0;padding:5px 2px 3px;font-size:16px;overflow-wrap:anywhere}
+.acts{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.meta{display:flex;flex-wrap:wrap;gap:3px 12px;align-items:center;padding-left:2px;font-size:12.5px}
+li.row.done .meta{opacity:.7}
+.chip{font-family:var(--font-body);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip.alert{color:var(--alert)}
+.chip.strong{color:var(--ink)}
+.cat{display:inline-flex;align-items:center;font-size:12px;background:var(--cat);color:#1d1d1d;border-radius:5px;padding:1px 8px;line-height:1.5}
+.cat .dot{display:none}
+.pill{display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;border:1px solid var(--ink);border-radius:999px;padding:1px 9px;font-family:var(--font-num);font-size:12.5px;line-height:1.5;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill svg{width:12px;height:12px;display:block}
+.pill button{border:0;background:transparent;padding:0;color:inherit;font:inherit;line-height:inherit;cursor:pointer}
+.pill .pill-time:hover{text-decoration:underline;text-underline-offset:3px}
+.pill .pill-bell{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-right:-5px;border-radius:50%}
+.pill .pill-bell:hover{background:var(--line)}
+.pill .pill-bell.off{color:var(--muted)}
+.pill.editing{border-style:dashed}
+.pill-input{width:46px;border:0;background:transparent;padding:0;font:inherit;color:inherit;outline:none;text-align:center}
+li.row.done .pill{border-color:var(--line);color:var(--muted)}
+.add-line .pill{font-size:13.5px;padding:2px 11px}
+.mini{border:0;background:transparent;font-size:12.5px;color:var(--muted);padding:0}
+.mini:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.mini.danger:hover{color:var(--alert)}
+.tbtn{border:1px solid var(--ink);background:transparent;font-size:12px;padding:1px 9px;line-height:1.5;white-space:nowrap}
+.tbtn.on{background:var(--ink);color:var(--paper)}
+.note-preview{margin:2px 0 0;padding-left:10px;border-left:2px solid var(--line);font-size:13.5px;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}
+.detail{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px 16px;margin:8px 0 6px;padding:10px 12px;border-left:2px solid var(--line)}
+.detail label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--muted)}
+.detail .wide{grid-column:1/-1}
+.detail textarea{border:1px solid var(--line);background:transparent;padding:6px 8px;font-size:14px;min-height:64px;resize:vertical;width:100%;outline:none;color:var(--ink)}
+.detail .links{display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:13px}
+.detail a{color:var(--ink);text-underline-offset:3px}
+.trash-title{padding:5px 2px;color:var(--muted);text-decoration:line-through;overflow-wrap:anywhere}
+.empty{color:var(--muted);padding:20px 0 8px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;font-size:13px;color:var(--muted)}
+.banner .note-sticky{display:block;max-width:460px;margin:8px 0;padding:10px 14px;font-size:13.5px;line-height:1.55}
+
+/* toast, timer, modal */
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 16px;font-size:14px;display:flex;gap:14px;align-items:center;max-width:calc(100% - 32px);z-index:30}
+body.has-timer .toast{bottom:92px}
+.toast button{white-space:nowrap;border:0;background:transparent;font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:0;color:inherit}
+.toast.alarm{font-weight:700}
+.timerbar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);width:min(640px, calc(100% - 24px));display:flex;align-items:center;gap:12px;padding:10px 14px;z-index:20;flex-wrap:wrap}
+.tb-info{flex:1 1 160px;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.tb-label{font-size:11.5px;opacity:.75}
+.tb-title{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-time{font-family:var(--font-num);font-size:24px;font-variant-numeric:tabular-nums;line-height:1}
+.tb-sub{display:block;font-size:11.5px;opacity:.75;font-family:var(--font-body)}
+.timerbar select{border:0;border-bottom:1px solid currentColor;background:transparent;font-size:13px;color:inherit}
+.timerbar select option{color:#111}
+.timerbar button{border:1px solid currentColor;background:transparent;color:inherit;padding:3px 12px;font-size:13.5px}
+.timerbar button.go{font-weight:700}
+.modal{position:fixed;inset:0;background:rgba(20,18,15,.38);display:flex;align-items:flex-start;justify-content:center;padding:60px 16px;z-index:40;overflow-y:auto}
+.modal-box{width:min(440px,100%);background:var(--paper);color:var(--ink);padding:20px 20px 16px;display:flex;flex-direction:column;gap:14px}
+.modal-box h3{margin:0;font-weight:400}
+.catedit{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.catedit li{display:flex;align-items:center;gap:10px}
+.catedit input[type="text"],.catadd input[type="text"]{flex:1;min-width:0;border:0;border-bottom:1px solid var(--line);background:transparent;padding:4px 2px;font-size:15px;outline:none}
+.catedit input[type="text"]:focus,.catadd input[type="text"]:focus{border-bottom-color:var(--ink)}
+input[type="color"]{width:28px;height:28px;padding:0;border:1px solid var(--line);border-radius:50%;background:transparent;cursor:pointer;flex:0 0 auto}
+input[type="color"]::-webkit-color-swatch-wrapper{padding:2px}
+input[type="color"]::-webkit-color-swatch{border:0;border-radius:50%}
+input[type="color"]::-moz-color-swatch{border:0;border-radius:50%}
+.catadd{display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.swatches{display:flex;gap:6px;flex-wrap:wrap}
+.swatches button{width:20px;height:20px;border-radius:50%;border:2px solid transparent;background:var(--cat);padding:0}
+.swatches button[aria-pressed="true"]{border-color:var(--ink)}
+.modal-foot{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted)}
+
+/* ================= MONO skin ================= */
+[data-skin="mono"] .brand{font-size:14px;font-weight:700;letter-spacing:.02em}
+[data-skin="mono"] nav.views button{font-size:14.5px;font-weight:500;padding:7px 10px;justify-content:space-between}
+[data-skin="mono"] nav.views button[aria-current="true"]{background:var(--ink);color:var(--paper)}
+[data-skin="mono"] nav.views button[aria-current="true"] .n{color:var(--paper)}
+[data-skin="mono"] .catlist button{padding:5px 10px}
+[data-skin="mono"] .catlist button[aria-current="true"]{font-weight:700;box-shadow:inset 2px 0 0 var(--ink)}
+[data-skin="mono"] .sheet{padding:6px 0 48px 8px}
+[data-skin="mono"] .dayhead .big{font-family:var(--font-num);font-size:46px;font-weight:500;letter-spacing:-.03em}
+[data-skin="mono"] .dayhead .dow{font-size:12px;color:var(--muted);padding-bottom:5px;line-height:1.3;letter-spacing:.06em}
+[data-skin="mono"] h2.view{font-size:22px;font-weight:700;letter-spacing:-.01em}
+[data-skin="mono"] section.group h3{font-size:12px;font-weight:700;color:var(--muted);border-top:1px solid var(--ink);padding-top:8px;letter-spacing:.04em}
+[data-skin="mono"] section.group.late h3{color:var(--alert);border-top-color:var(--alert)}
+[data-skin="mono"] li.row{border-bottom:1px solid var(--line);padding:8px 0}
+[data-skin="mono"] .title-in{border-bottom-width:2px}
+[data-skin="mono"] input[type="date"],[data-skin="mono"] input[type="time"],[data-skin="mono"] select.sel{border-bottom-style:solid;border-bottom-color:var(--line)}
+[data-skin="mono"] .quick button[aria-pressed="true"]{color:var(--ink);font-weight:700;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px}
+[data-skin="mono"] .primary{background:var(--ink);color:var(--paper);font-weight:700;font-size:14px;padding:6px 16px}
+[data-skin="mono"] .check .box{width:18px;height:18px;border-width:1.5px;border-radius:50%}
+[data-skin="mono"] .check input:checked + .box{background:var(--ink)}
+[data-skin="mono"] .check input:checked + .box::after{content:"";position:absolute;left:5px;top:2px;width:4px;height:8px;border:solid var(--paper);border-width:0 2px 2px 0;transform:rotate(45deg)}
+[data-skin="mono"] .done-title{color:var(--muted);text-decoration:line-through}
+[data-skin="mono"] .empty{font-size:14px}
+[data-skin="mono"] .banner .note-sticky{border:1px solid var(--ink);background:transparent}
+[data-skin="mono"] .toast,[data-skin="mono"] .timerbar{background:var(--ink);color:var(--paper)}
+[data-skin="mono"] .timerbar button.go{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+[data-skin="mono"] .modal-box{border:1px solid var(--ink)}
+[data-skin="mono"] .modal-box h3{font-size:17px;font-weight:700}
+
+.auth{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+.auth-box{width:min(340px,100%);display:flex;flex-direction:column;gap:12px}
+.auth-box .brand{margin:0 0 8px}
+.auth-box input{border:0;border-bottom:1.5px solid var(--line);background:transparent;padding:10px 2px;font-size:16px;outline:none;color:var(--ink)}
+.auth-box input:focus{border-bottom-color:var(--ink)}
+.auth-box .primary{padding:10px 16px;font-size:15px}
+.auth-msg{margin:0;min-height:1.4em;font-size:13px;color:var(--alert)}
+.auth-msg.ok{color:var(--muted)}
+.acct{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+label.linkbtn{cursor:pointer;position:relative}
+label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+@media (max-width:760px){
+  .cover{height:150px}
+  .cover.empty{height:84px}
+  .cover-tools{right:12px;bottom:10px}
+  .app{grid-template-columns:1fr;gap:12px;padding:16px 12px 80px}
+  aside{position:static;gap:8px}
+  nav.views{flex-direction:row;overflow-x:auto;gap:12px;padding:0 2px 2px}
+  nav.views button{flex:0 0 auto}
+  [data-skin="mono"] nav.views{gap:4px}
+  nav.views .sep{display:none}
+  .cats{flex-direction:row;align-items:center;gap:8px}
+  .cats-head span{display:none}
+  .catlist{flex-direction:row;overflow-x:auto;gap:6px}
+  .catlist button{flex:0 0 auto}
+  aside{display:contents}
+  aside > .brand{order:1} aside > nav.views{order:2} aside > .cats{order:3}
+  main.sheet{order:4}
+  .rail-foot{order:5;flex-direction:row;flex-wrap:wrap;gap:6px 14px;padding-top:24px;border-top:1px solid var(--line)}
+  .head-right{align-items:flex-start}
+  .acts .mini{display:none}
+  .acts .mini.always{display:inline}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="cover empty" id="cover" hidden>
+  <img id="coverImg" alt="" hidden draggable="false">
+  <div class="cover-tools">
+    <button type="button" class="move" id="coverMove" aria-label="사진 위치 조정" title="위치 조정" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4"/></svg></button>
+    <label id="coverAdd" title="커버 사진"><input type="file" id="coverFile" accept="image/*" aria-label="커버 사진 올리기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></label>
+    <button type="button" id="coverDel" aria-label="커버 사진 삭제" title="삭제" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg></button>
+  </div>
+</div>
+<div class="app">
+  <aside>
+    <p class="brand">Summer's planner</p>
+    <nav class="views" id="nav" aria-label="보기">
+      <button data-view="today"><span class="lbl">오늘</span><span class="n" data-count="today"></span></button>
+      <button data-view="upcoming"><span class="lbl">예정</span><span class="n" data-count="upcoming"></span></button>
+      <button data-view="someday"><span class="lbl">언젠가</span><span class="n" data-count="someday"></span></button>
+      <div class="sep"></div>
+      <button data-view="done"><span class="lbl">완료</span><span class="n" data-count="done"></span></button>
+      <button data-view="trash"><span class="lbl">휴지통</span><span class="n" data-count="trash"></span></button>
+    </nav>
+    <div class="cats">
+      <div class="cats-head"><span>카테고리</span><button type="button" class="mini always" id="manageCats">편집</button></div>
+      <div class="catlist" id="catList"></div>
+    </div>
+    <div class="rail-foot">
+      <span class="acct" id="acctEmail"></span>
+      <button type="button" class="linkbtn" id="backupBtn">백업 받기</button>
+      <label class="linkbtn">백업 가져오기<input type="file" id="importFile" accept=".json,application/json"></label>
+      <button type="button" class="linkbtn" id="logoutBtn" hidden>로그아웃</button>
+    </div>
+  </aside>
+
+  <main class="sheet">
+    <div class="sheet-head">
+      <div class="dayhead" id="todayLabel"></div>
+      <div class="head-right">
+        <span class="status" id="status" role="status"><i></i><span>불러오는 중…</span></span>
+        <button type="button" class="alarm-btn" id="alarmBtn">알림 켜기</button>
+      </div>
+    </div>
+    <div class="banner" id="banner"></div>
+    <h2 class="view" id="viewTitle">오늘</h2>
+
+    <form class="add" id="addForm" autocomplete="off">
+      <div class="catpick" id="catPick" role="group" aria-label="카테고리 선택"></div>
+      <div class="add-line">
+        <span class="pill" id="timePreview" hidden></span>
+        <input class="title-in" id="newTitle" placeholder="할 일" aria-label="새 할 일 (예: 18:00 수업 듣기)">
+        <button class="primary" type="submit">적기</button>
+      </div>
+      <div class="add-meta">
+        <div class="quick" role="group" aria-label="날짜 빠른 선택">
+          <button type="button" data-quick="today">오늘</button>
+          <button type="button" data-quick="tomorrow">내일</button>
+          <button type="button" data-quick="none">날짜 없음</button>
+        </div>
+        <input type="date" id="newDate" aria-label="날짜">
+        <label class="fld">마감 <input type="date" id="newDue"></label>
+      </div>
+    </form>
+
+    <div class="listbar" id="listbar">
+      <label>정렬 <select class="sel" id="sortSel"></select></label>
+      
+    </div>
+    <div id="content"></div>
+  </main>
+</div>
+
+<datalist id="none"></datalist>
+
+<div class="timerbar" id="timerbar" hidden>
+  <div class="tb-info"><span class="tb-label" id="tbLabel">진행 중</span><span class="tb-title" id="tbTitle"></span></div>
+  <span class="tb-time" id="tbTime">0:00</span>
+  <select id="tbGoal" aria-label="목표 시간">
+    <option value="">목표 없음</option><option value="25">목표 25분</option><option value="50">목표 50분</option><option value="90">목표 90분</option>
+  </select>
+  <button type="button" id="tbPause">일시정지</button>
+  <button type="button" class="go" id="tbDone">완료</button>
+</div>
+
+<div class="modal" id="catModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="catModalTitle">
+    <h3 id="catModalTitle">카테고리</h3>
+    <ul class="catedit" id="catEdit"></ul>
+    <form class="catadd" id="catAdd" autocomplete="off">
+      <input type="color" id="newCatColor" aria-label="새 카테고리 색">
+      <input type="text" id="newCatName" placeholder="이름" aria-label="새 카테고리 이름">
+      <button type="submit" class="primary">추가</button>
+    </form>
+    <div class="swatches" id="swatches" aria-label="추천 색"></div>
+    <div class="modal-foot"><span></span><button type="button" class="mini always" id="catClose">닫기</button></div>
+  </div>
+</div>
+
+<div class="auth" id="auth" hidden>
+  <form class="auth-box" id="authForm" autocomplete="on">
+    <p class="brand">Summer's planner</p>
+    <input type="email" id="authEmail" placeholder="이메일" autocomplete="email" required>
+    <input type="password" id="authPw" placeholder="비밀번호" autocomplete="current-password" required minlength="6">
+    <button class="primary" type="submit" id="authGo">로그인</button>
+    <button type="button" class="mini always" id="authSwitch">가입하기</button>
+    <p class="auth-msg" id="authMsg" role="alert"></p>
+  </form>
+</div>
+
+<div class="toast" id="toast" hidden><span id="toastMsg"></span><button type="button" id="toastAct"></button></div>
+
+<script src="config.js"></script>
+<script src="vendor/supabase.js"></script>
+<script>
+(function(){
+  "use strict";
+  const CACHE_KEY = "planner.items.v1", OUTBOX_KEY = "planner.outbox.v1", SETTINGS_KEY = "planner.settings.v1";
+  const FIRED_KEY = "planner.fired.v1", ALARM_KEY = "planner.alarm";
+  const SETTINGS_ID = "__settings";
+  const WD = "일월화수목금토", WD_EN = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  const VIEWS = {today:"오늘", upcoming:"예정", someday:"언젠가", done:"완료", trash:"휴지통"};
+  const SORTS = {datetime:"날짜·시간순", due:"마감 임박순", created:"등록순", manual:"직접 정렬"};
+  const REMIND = [["", "없음"], ["0", "정각"], ["5", "5분 전"], ["10", "10분 전"], ["30", "30분 전"], ["60", "1시간 전"], ["1440", "하루 전"]];
+  const TRASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>';
+  const OLD_PALETTE = ["#e0a526", "#4f9a6a", "#d26a7a", "#7d6bc4", "#3f86c2", "#c9763a", "#2f8f8f", "#b5524a", "#5a6fa8", "#8a8a8a"];
+  const PALETTE = ["#f7dc8f", "#a9dcc0", "#f5b8c4", "#cbbff0", "#a9d1f0", "#f8c6a3", "#a5ddd8", "#f2aba3", "#b8c5ef", "#d6d6d6"];
+  const BELL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>';
+  const BELL_OFF_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 9.5-4.9M18 8c0 7 3 8 3 8H8"/><path d="M6 8c0 7-3 8-3 8h2"/><path d="M10 20a2 2 0 0 0 4 0"/><path d="M3 3l18 18"/></svg>';
+  function normTime(v){
+    v = String(v || "").trim();
+    if (!v) return "";
+    let m = v.match(/^(\d{1,2})(?:[:.]?(\d{2}))?$/);
+    if (m) {
+      const h = Number(m[1]), mi = m[2] != null ? Number(m[2]) : 0;
+      return h < 24 && mi < 60 ? pad(h) + ":" + pad(mi) : null;
+    }
+    const p = parseTime(v);
+    return p && p.title === v.trim() ? null : (p ? p.time : null);
+  }
+  // "18:00 수업", "오후 6시 수업", "6시 반 회의", "수업 9:30" -> {time, title}
+  const TIME_RE = /(^|\s)(오전|오후|아침|저녁|밤)?\s*(\d{1,2})(?::([0-5]\d)|시(?:\s*([0-5]?\d)\s*분|\s*(반))?)(?:에|부터|까지)?(?=\s|$)/;
+  function parseTime(text){
+    const m = TIME_RE.exec(text);
+    if (!m) return null;
+    let h = Number(m[3]);
+    const min = m[4] != null ? Number(m[4]) : m[5] != null ? Number(m[5]) : m[6] ? 30 : 0;
+    const ap = m[2];
+    if (h > 24 || min > 59) return null;
+    if (ap === "오후" || ap === "저녁" || ap === "밤") { if (h < 12) h += 12; }
+    else if (ap === "오전" || ap === "아침") { if (h === 12) h = 0; }
+    if (h === 24) h = 0;
+    const rest = (text.slice(0, m.index) + m[1] + text.slice(m.index + m[0].length)).replace(/\s+/g, " ").trim();
+    return {time: pad(h) + ":" + pad(min), title: rest || text.trim()};
+  }
+
+  const $ = (s) => document.querySelector(s);
+  const pad = (n) => String(n).padStart(2, "0");
+  const ymd = (d) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  const today = () => ymd(new Date());
+  const parse = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return ymd(d); };
+  const diffDays = (a, b) => Math.round((parse(a) - parse(b)) / 86400000);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const newId = (p) => (p || "t") + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  function fmtDate(s){
+    if (!s) return "";
+    const t = today();
+    if (s === t) return "오늘";
+    if (s === addDays(t, 1)) return "내일";
+    if (s === addDays(t, -1)) return "어제";
+    const d = parse(s);
+    return (d.getMonth() + 1) + "월 " + d.getDate() + "일 (" + WD[d.getDay()] + ")";
+  }
+  function fmtTime(t){
+    if (!t) return "";
+    const [h, m] = t.split(":").map(Number);
+    return (h < 12 ? "오전 " : "오후 ") + ((h % 12) || 12) + ":" + pad(m);
+  }
+  function fmtDur(ms){
+    const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60;
+    return h ? h + ":" + pad(m) + ":" + pad(x) : m + ":" + pad(x);
+  }
+  function fmtMin(ms){
+    const m = Math.round(ms / 60000);
+    if (m < 1) return "1분 미만";
+    return m >= 60 ? Math.floor(m / 60) + "시간 " + (m % 60 ? (m % 60) + "분" : "") : m + "분";
+  }
+  function lsGet(k, def){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } }
+  function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+  // ================= state =================
+  function normSettings(s){
+    s = s || {};
+    return {
+      categories: Array.isArray(s.categories) ? s.categories.filter((c) => c && c.id).map((c) => ({id: String(c.id), name: String(c.name || ""), color: /^#[0-9a-fA-F]{6}$/.test(c.color) ? c.color.toLowerCase() : PALETTE[0]})) : [],
+      sort: SORTS[s.sort] ? s.sort : "datetime",
+      coverPath: typeof s.coverPath === "string" ? s.coverPath : "",
+      coverUrl: typeof s.coverUrl === "string" ? s.coverUrl : "",
+      coverY: typeof s.coverY === "number" ? Math.max(0, Math.min(100, s.coverY)) : 50,
+      updatedAt: s.updatedAt || 0,
+    };
+  }
+  let settings = normSettings(lsGet(SETTINGS_KEY, null));
+  let items = new Map(Object.entries(lsGet(CACHE_KEY, {})));
+  let outbox = lsGet(OUTBOX_KEY, {});
+  for (const [id, e] of Object.entries(outbox)) {
+    if (id === SETTINGS_ID) { if (e.op === "set") settings = normSettings(e.data); continue; }
+    if (e.op === "set") items.set(id, e.data); else items.delete(id);
+  }
+  let fired = lsGet(FIRED_KEY, {});
+
+  let sb = null, uid = null;
+  let mode = "loading";          // loading | cloud | local
+  let migrated = false, lastError = null, flushing = false;
+  let flushTimer = null, retryTimer = null, pullTimer = null;
+  const PULL_KEY = "planner.pulledAt.v1", AUTH_KEY = "planner.auth", LAST_UID_KEY = "planner.lastUid";
+  const openSet = new Set();
+  let editingTime = null;
+  let filterCat = null;      // null = all, "none" = uncategorized, else category id
+  let view = VIEWS[location.hash.slice(1)] ? location.hash.slice(1) : "today";
+  let drag = null, renderPending = false;
+
+  // ================= saving =================
+  function persist(){
+    lsSet(CACHE_KEY, Object.fromEntries(items));
+    lsSet(OUTBOX_KEY, outbox);
+    lsSet(SETTINGS_KEY, settings);
+    updateStatus();
+  }
+  function commit(id, data){
+    data.updatedAt = Date.now();
+    items.set(id, data);
+    outbox[id] = {op: "set", data};
+    persist();
+    scheduleFlush();
+  }
+  function purge(id){
+    const data = {purged: true, deleted: true, updatedAt: Date.now()};
+    items.delete(id);
+    outbox[id] = {op: "set", data};
+    persist();
+    scheduleFlush(100);
+  }
+  function commitSettings(patch){
+    settings = Object.assign({}, settings, patch, {updatedAt: Date.now()});
+    outbox[SETTINGS_ID] = {op: "set", data: settings};
+    persist();
+    scheduleFlush();
+  }
+  function scheduleFlush(delay){
+    clearTimeout(flushTimer);
+    flushTimer = setTimeout(flush, delay == null ? 600 : delay);
+  }
+  const isNetErr = (e) => !navigator.onLine || /fetch|network|load failed|timeout/i.test(String(e && (e.message || e)));
+  async function flush(){
+    if (!sb || !uid || flushing) { updateStatus(); return; }
+    const snapshot = Object.entries(outbox);
+    if (!snapshot.length) { updateStatus(); return; }
+    if (!navigator.onLine) { updateStatus(); return; }
+    flushing = true;
+    updateStatus();
+    let failed = false;
+    try {
+      const rows = [];
+      for (const [id, e] of snapshot) {
+        if (id === SETTINGS_ID) continue;
+        const data = e.op === "set" ? e.data : {purged: true, deleted: true, updatedAt: Date.now()};
+        rows.push({user_id: uid, id, data, updated_at: Math.round(data.updatedAt || Date.now())});
+      }
+      for (let i = 0; i < rows.length; i += 200) {
+        const {error} = await sb.from("items").upsert(rows.slice(i, i + 200));
+        if (error) throw error;
+      }
+      const st = outbox[SETTINGS_ID];
+      if (st) {
+        const {error} = await sb.from("settings").upsert({user_id: uid, data: st.data, updated_at: Math.round(st.data.updatedAt || Date.now())});
+        if (error) throw error;
+      }
+      for (const [id, e] of snapshot) if (outbox[id] === e) delete outbox[id];
+      lsSet(OUTBOX_KEY, outbox);
+      lastError = null;
+    } catch (e) {
+      failed = true;
+      lastError = isNetErr(e) ? "offline" : "server";
+      console.warn("flush", e);
+    }
+    flushing = false;
+    updateStatus();
+    if (Object.keys(outbox).length) {
+      clearTimeout(retryTimer);
+      retryTimer = setTimeout(flush, failed ? 10000 : 800);
+    }
+  }
+  window.addEventListener("online", () => { lastError = null; scheduleFlush(200); schedulePull(300); updateStatus(); });
+  window.addEventListener("offline", updateStatus);
+
+  function updateStatus(){
+    const el = $("#status");
+    const pending = Object.keys(outbox).length;
+    let cls = "", txt = "";
+    if (mode === "local") { cls = "warn"; txt = "이 기기에만 저장 중"; }
+    else if (mode === "loading") { cls = ""; txt = "연결 중…"; }
+    else if (!navigator.onLine || lastError === "offline") { cls = "warn"; txt = pending ? "오프라인 · " + pending + "건 대기" : "오프라인"; }
+    else if (lastError === "server") { cls = "bad"; txt = "저장 실패 · 다시 시도 중"; }
+    else if (pending || flushing) { cls = ""; txt = "저장 중…"; }
+    else { cls = "ok"; txt = "모두 저장됨"; }
+    el.className = "status " + cls;
+    el.lastElementChild.textContent = txt;
+  }
+
+  // ================= helpers on items =================
+  const catOf = (it) => (it.categoryId && settings.categories.find((c) => c.id === it.categoryId)) || null;
+  function whenTs(it){
+    if (!it.date || !it.time) return null;
+    const [y, m, d] = it.date.split("-").map(Number), [hh, mm] = it.time.split(":").map(Number);
+    return new Date(y, m - 1, d, hh, mm).getTime();
+  }
+  const ord = (it) => (typeof it.order === "number" ? it.order : (it.createdAt || 0));
+  const elapsed = (it) => (it.spent || 0) + (it.timerStart ? Math.max(0, Date.now() - it.timerStart) : 0);
+  function cmp(a, b){
+    const s = settings.sort;
+    if (s === "created") return (a.createdAt || 0) - (b.createdAt || 0);
+    if (s === "manual") return ord(a) - ord(b);
+    if (s === "due") {
+      const x = a.due || "9999-12-31", y = b.due || "9999-12-31";
+      if (x !== y) return x < y ? -1 : 1;
+    }
+    const ka = (a.date || "9999-12-31") + " " + (a.time || "99:99"), kb = (b.date || "9999-12-31") + " " + (b.time || "99:99");
+    if (ka !== kb) return ka < kb ? -1 : 1;
+    return (a.createdAt || 0) - (b.createdAt || 0);
+  }
+  function all(){ return [...items.entries()].map(([id, d]) => Object.assign({id}, d)); }
+  function passCat(i){
+    if (filterCat == null) return true;
+    if (filterCat === "none") return !catOf(i);
+    return i.categoryId === filterCat && !!catOf(i);
+  }
+  const doneOn = (it) => (it.doneAt ? ymd(new Date(it.doneAt)) : "");
+  function buckets(){
+    const t = today();
+    const live = all().filter((i) => !i.deleted && passCat(i));
+    return {
+      late: live.filter((i) => !i.done && i.date && i.date < t).sort(cmp),
+      today: live.filter((i) => !i.done && i.date === t).sort(cmp),
+      doneToday: live.filter((i) => i.done && doneOn(i) === t).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)),
+      upcoming: live.filter((i) => !i.done && i.date && i.date > t).sort(cmp),
+      someday: live.filter((i) => !i.done && !i.date).sort(cmp),
+      done: live.filter((i) => i.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)),
+      trash: all().filter((i) => i.deleted).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)),
+    };
+  }
+
+  // ================= rendering =================
+  function catOptions(sel){
+    return '<option value="">없음</option>' +
+      settings.categories.map((c) => '<option value="' + esc(c.id) + '"' + (c.id === sel ? " selected" : "") + ">" + esc(c.name || "(이름 없음)") + "</option>").join("") +
+      '<option value="__new">+ 새 카테고리…</option>';
+  }
+  function remindOptions(sel){
+    const v = sel == null ? "" : String(sel);
+    return REMIND.map(([k, l]) => '<option value="' + k + '"' + (k === v ? " selected" : "") + ">" + l + "</option>").join("");
+  }
+  function dueChip(it){
+    if (!it.due || it.done) return it.due ? '<span class="chip">마감 ' + esc(fmtDate(it.due)) + "</span>" : "";
+    const n = diffDays(it.due, today());
+    if (n < 0) return '<span class="chip alert">마감 ' + (-n) + "일 지남</span>";
+    if (n === 0) return '<span class="chip alert">오늘 마감</span>';
+    return '<span class="chip' + (n <= 2 ? " alert" : " strong") + '">마감 D-' + n + "</span>";
+  }
+  function gcalURL(it){
+    if (!it.date) return "";
+    let tz = "Asia/Seoul";
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || tz; } catch (e) {}
+    const d = it.date.replace(/-/g, "");
+    let dates;
+    if (it.time) {
+      const end = new Date(whenTs(it) + 3600000);
+      dates = d + "T" + it.time.replace(":", "") + "00/" + ymd(end).replace(/-/g, "") + "T" + pad(end.getHours()) + pad(end.getMinutes()) + "00";
+    } else {
+      dates = d + "/" + addDays(it.date, 1).replace(/-/g, "");
+    }
+    const p = new URLSearchParams({action: "TEMPLATE", text: it.title || "할 일", dates, ctz: tz});
+    if (it.note) p.set("details", it.note);
+    return "https://calendar.google.com/calendar/render?" + p.toString();
+  }
+  function rowHTML(it, showDate){
+    const t = today();
+    const overdue = !it.done && it.date && it.date < t;
+    const cat = catOf(it);
+    const isOpen = openSet.has(it.id);
+    const running = !!it.timerStart;
+    const manual = settings.sort === "manual" && !it.done;
+    const spent = elapsed(it);
+    let chips = "";
+    if (showDate && it.date) chips += '<span class="chip">' + esc(fmtDate(it.date)) + "</span>";
+    if (overdue) chips += '<span class="chip alert late">' + diffDays(t, it.date) + "일 지남</span>";
+    chips += dueChip(it);
+    if (running) chips += '<span class="chip strong">진행 중</span>';
+    else if (spent > 0) chips += '<span class="chip">' + (it.done ? "걸린 시간 " : "누적 ") + fmtMin(spent) + "</span>";
+    if (cat) chips += '<span class="cat" style="--cat:' + esc(cat.color) + '"><span class="dot"></span>' + esc(cat.name) + "</span>";
+
+    const timerBtn = it.done ? "" : '<button type="button" class="tbtn' + (running ? " on" : "") + '" data-act="timer">' + (running ? "일시정지" : (spent > 0 ? "이어서" : "시작")) + "</button>";
+    let pill = "";
+    if (editingTime === it.id) {
+      pill = '<span class="pill editing"><input class="pill-input" data-field="__time" value="' + esc(it.time || "") + '" maxlength="5" inputmode="numeric" placeholder="00:00" aria-label="시간 (비우면 삭제)"></span>';
+    } else if (it.time) {
+      const on = it.remind != null;
+      pill = '<span class="pill"><button type="button" class="pill-time" data-act="edit-time" aria-label="시간 수정">' + esc(it.time) + "</button>" +
+        (it.done ? "" : '<button type="button" class="pill-bell' + (on ? "" : " off") + '" data-act="bell" aria-pressed="' + on + '" aria-label="알림 ' + (on ? "끄기" : "켜기") + '" title="알림 ' + (on ? "끄기" : "켜기") + '">' + (on ? BELL_SVG : BELL_OFF_SVG) + "</button>") +
+        "</span>";
+    }
+    const title = it.done
+      ? '<div class="done-title"><span>' + esc(it.title || "(제목 없음)") + "</span></div>"
+      : '<input class="title" data-field="title" value="' + esc(it.title) + '" aria-label="할 일 제목">';
+    const detail = isOpen ? (
+      '<div class="detail">' +
+        '<label>날짜<input type="date" data-field="date" value="' + esc(it.date || "") + '"></label>' +
+        '<label>시간<input type="time" data-field="time" value="' + esc(it.time || "") + '"></label>' +
+        '<label>마감일<input type="date" data-field="due" value="' + esc(it.due || "") + '"></label>' +
+        '<label>카테고리<select class="sel" data-field="categoryId">' + catOptions(it.categoryId) + "</select></label>" +
+        '<label>알림<select class="sel" data-field="remind"' + (it.time ? "" : " disabled") + ">" + remindOptions(it.remind) + "</select></label>" +
+        '<label class="wide">메모<textarea data-field="note">' + esc(it.note) + "</textarea></label>" +
+        '<div class="wide links">' +
+          (it.date ? '<a href="' + esc(gcalURL(it)) + '" target="_blank" rel="noopener">구글 캘린더에 추가</a>' : "") +
+          (spent > 0 && !running ? '<button type="button" class="mini" data-act="reset-time">기록 시간 지우기</button>' : "") +
+        "</div>" +
+      "</div>") : (it.note ? '<p class="note-preview">' + esc(it.note) + "</p>" : "");
+    return '<li class="row' + (it.done ? " done" : "") + (manual ? " has-handle" : "") + '" data-id="' + esc(it.id) + '">' +
+      (manual ? '<button type="button" class="handle" aria-label="끌어서 순서 바꾸기" title="끌어서 순서 바꾸기">⋮⋮</button>' : "") +
+      '<label class="check"><input type="checkbox" data-field="done"' + (it.done ? " checked" : "") + ' aria-label="완료 표시"><span class="box"></span></label>' +
+      '<div class="body">' +
+        '<div class="line1">' + pill + title + '<div class="acts">' + timerBtn +
+          '<button type="button" class="mini always" data-act="detail">' + (isOpen ? "닫기" : "자세히") + "</button>" +
+          '<button type="button" class="icon-btn" data-act="del" aria-label="삭제" title="휴지통으로">' + TRASH_SVG + "</button></div></div>" +
+        (chips ? '<div class="meta">' + chips + "</div>" : "") +
+        detail +
+      "</div></li>";
+  }
+  function trashRowHTML(it){
+    return '<li class="row" data-id="' + esc(it.id) + '"><span></span><div class="body">' +
+      '<div class="trash-title">' + esc(it.title || "(제목 없음)") + "</div>" +
+      '<div class="meta"><button type="button" class="mini" data-act="restore">복원</button>' +
+      '<button type="button" class="mini danger" data-act="purge">영구 삭제</button></div></div></li>';
+  }
+  function group(title, list, cls, showDate){
+    if (!list.length) return "";
+    return '<section class="group ' + (cls || "") + '"><h3>' + esc(title) + ' <span class="n">' + list.length + "</span></h3>" +
+      '<ul class="list">' + list.map((it) => rowHTML(it, showDate)).join("") + "</ul></section>";
+  }
+  const empty = (msg) => '<div class="empty">' + msg + "</div>";
+
+  function render(){
+    if (drag) { renderPending = true; return; }
+    const ae = document.activeElement;
+    let keep = null;
+    if (ae && ae.dataset && ae.dataset.field && ae.closest("#content [data-id]")) {
+      keep = {id: ae.closest("[data-id]").dataset.id, field: ae.dataset.field, s: ae.selectionStart, e: ae.selectionEnd};
+    }
+    const b = buckets();
+    const t = today();
+    let html = "";
+    if (view === "today") {
+      html = group("지난 일", b.late, "late", true) + group("남은 일", b.today) + group("오늘 완료", b.doneToday);
+      if (!html) html = empty("없음");
+    } else if (view === "upcoming") {
+      if (settings.sort === "datetime") {
+        const byDate = new Map();
+        for (const it of b.upcoming) { if (!byDate.has(it.date)) byDate.set(it.date, []); byDate.get(it.date).push(it); }
+        for (const [d, list] of byDate) html += group(fmtDate(d) + (diffDays(d, t) > 1 ? " · " + diffDays(d, t) + "일 뒤" : ""), list);
+      } else {
+        html = group("예정된 일", b.upcoming, "", true);
+      }
+      if (!html) html = empty("없음");
+    } else if (view === "someday") {
+      html = group("날짜 없음", b.someday) || empty("없음");
+    } else if (view === "done") {
+      const byDay = new Map();
+      for (const it of b.done) { const k = doneOn(it) || "기록 없음"; if (!byDay.has(k)) byDay.set(k, []); byDay.get(k).push(it); }
+      for (const [d, list] of byDay) html += group(d === "기록 없음" ? d : fmtDate(d) + " 완료", list, "", true);
+      if (!html) html = empty("없음");
+    } else if (view === "trash") {
+      html = b.trash.length
+        ? '<div class="toolbar"><span></span><button type="button" class="mini danger" data-act="empty-trash">휴지통 비우기</button></div>' +
+          '<ul class="list">' + b.trash.map(trashRowHTML).join("") + "</ul>"
+        : empty("비어 있음");
+    }
+    $("#content").innerHTML = html;
+    const catName = filterCat === "none" ? "미분류" : (filterCat && (settings.categories.find((c) => c.id === filterCat) || {}).name);
+    $("#viewTitle").textContent = VIEWS[view] + (catName ? " · " + catName : "");
+    $("#addForm").hidden = (view === "done" || view === "trash");
+    $("#listbar").hidden = (view === "done" || view === "trash");
+
+    const counts = {today: b.late.length + b.today.length, upcoming: b.upcoming.length, someday: b.someday.length, done: b.done.length, trash: b.trash.length};
+    document.querySelectorAll("[data-count]").forEach((el) => { const n = counts[el.dataset.count]; el.textContent = n ? n : ""; });
+    document.querySelectorAll("#nav button").forEach((btn) => btn.setAttribute("aria-current", btn.dataset.view === view ? "true" : "false"));
+    renderCats();
+    renderCover();
+    renderAddSelects();
+
+    if (keep) {
+      const el = document.querySelector('#content [data-id="' + CSS.escape(keep.id) + '"] [data-field="' + keep.field + '"]');
+      if (el) { el.focus(); try { el.setSelectionRange(keep.s, keep.e); } catch (e) {} }
+    }
+    updateTimerBar();
+    updateStatus();
+  }
+  function renderCats(){
+    const active = all().filter((i) => !i.deleted && !i.done);
+    const count = (fn) => active.filter(fn).length;
+    let html = '<button type="button" data-cat=""' + (filterCat == null ? ' aria-current="true"' : "") + '><span class="lbl">전체</span></button>';
+    for (const c of settings.categories) {
+      const n = count((i) => i.categoryId === c.id);
+      html += '<button type="button" data-cat="' + esc(c.id) + '"' + (filterCat === c.id ? ' aria-current="true"' : "") + '><span class="dot" style="--cat:' + esc(c.color) + '"></span><span class="lbl">' + esc(c.name || "(이름 없음)") + '</span><span class="n">' + (n || "") + "</span></button>";
+    }
+    const none = count((i) => !catOf(i));
+    if (settings.categories.length && (none || filterCat === "none")) {
+      html += '<button type="button" data-cat="none"' + (filterCat === "none" ? ' aria-current="true"' : "") + '><span class="dot none"></span><span class="lbl">미분류</span><span class="n">' + (none || "") + "</span></button>";
+    }
+    $("#catList").innerHTML = html;
+  }
+  let newCatId = "";
+  function renderAddSelects(){
+    if (newCatId && !settings.categories.some((c) => c.id === newCatId)) newCatId = "";
+    $("#catPick").innerHTML =
+      '<button type="button" data-pick="" aria-pressed="' + (!newCatId) + '">없음</button>' +
+      settings.categories.map((c) => '<button type="button" data-pick="' + esc(c.id) + '" style="--cat:' + esc(c.color) + '" aria-pressed="' + (newCatId === c.id) + '"><span class="dot"></span>' + esc(c.name || "-") + "</button>").join("") +
+      '<button type="button" class="add-cat" data-pick="__new" aria-label="새 카테고리" title="새 카테고리">+</button>';
+    const ss = $("#sortSel");
+    if (document.activeElement !== ss) ss.innerHTML = Object.entries(SORTS).map(([k, l]) => '<option value="' + k + '"' + (k === settings.sort ? " selected" : "") + ">" + l + "</option>").join("");
+  }
+
+  // ================= add form =================
+  function setNewDate(v){ $("#newDate").value = v; syncQuick(); }
+  function syncQuick(){
+    const v = $("#newDate").value, t = today();
+    document.querySelectorAll("[data-quick]").forEach((b) => {
+      const on = (b.dataset.quick === "today" && v === t) || (b.dataset.quick === "tomorrow" && v === addDays(t, 1)) || (b.dataset.quick === "none" && !v);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+  function syncNewRemind(){
+    const p = parseTime($("#newTitle").value);
+    const el = $("#timePreview");
+    el.hidden = !p;
+    el.textContent = p ? p.time : "";
+  }
+  const defaultDateFor = (v) => (v === "today" ? today() : v === "upcoming" ? addDays(today(), 1) : "");
+  document.querySelectorAll("[data-quick]").forEach((b) => b.addEventListener("click", () => {
+    const q = b.dataset.quick;
+    setNewDate(q === "today" ? today() : q === "tomorrow" ? addDays(today(), 1) : "");
+  }));
+  $("#newDate").addEventListener("change", syncQuick);
+  $("#newTitle").addEventListener("input", syncNewRemind);
+  $("#catPick").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-pick]"); if (!b) return;
+    if (b.dataset.pick === "__new") { openCatModal(); return; }
+    newCatId = b.dataset.pick;
+    renderAddSelects();
+  });
+  $("#addForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const raw = $("#newTitle").value.trim();
+    if (!raw) { $("#newTitle").focus(); return; }
+    const parsed = parseTime(raw);
+    const title = parsed ? parsed.title : raw;
+    const time = parsed ? parsed.time : "";
+    const now = Date.now();
+    commit(newId(), {
+      kind: "task", title, note: "",
+      date: $("#newDate").value || "", time, due: $("#newDue").value || "",
+      categoryId: newCatId,
+      remind: time ? 0 : null,
+      done: false, doneAt: null, deleted: false, createdAt: now, order: now,
+      spent: 0, timerStart: null, timerGoal: null,
+    });
+    $("#newTitle").value = ""; $("#newDue").value = "";
+    syncNewRemind();
+    render();
+    $("#newTitle").focus();
+  });
+  $("#sortSel").addEventListener("change", (e) => { commitSettings({sort: e.target.value}); render(); });
+
+  // ================= list interactions =================
+  const content = $("#content");
+  content.addEventListener("input", (e) => {
+    const f = e.target.dataset.field;
+    if (f !== "title" && f !== "note") return;
+    const id = e.target.closest("[data-id]").dataset.id;
+    const cur = items.get(id); if (!cur) return;
+    commit(id, Object.assign({}, cur, {[f]: e.target.value}));
+  });
+  content.addEventListener("change", (e) => {
+    const f = e.target.dataset.field;
+    if (!f || f === "title" || f === "note" || f === "__time") return;
+    const id = e.target.closest("[data-id]").dataset.id;
+    const cur = items.get(id); if (!cur) return;
+    const next = Object.assign({}, cur);
+    const v = e.target.value;
+    if (f === "done") {
+      const now = Date.now();
+      if (e.target.checked && next.timerStart) { next.spent = (next.spent || 0) + now - next.timerStart; next.timerStart = null; }
+      next.done = e.target.checked; next.doneAt = e.target.checked ? now : null;
+    } else if (f === "categoryId") {
+      if (v === "__new") { e.target.value = cur.categoryId || ""; openCatModal(id); return; }
+      next.categoryId = v;
+    } else if (f === "remind") {
+      next.remind = v === "" ? null : Number(v);
+    } else if (f === "time") {
+      next.time = v || "";
+      if (v && cur.remind == null && !cur.time) next.remind = 0;
+    } else {
+      next[f] = v || "";
+    }
+    commit(id, next);
+    render();
+  });
+  content.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-act]"); if (!btn) return;
+    const act = btn.dataset.act;
+    if (act === "empty-trash") {
+      const n = buckets().trash.length;
+      showToast(n + "개 영구 삭제?", "삭제", () => { buckets().trash.forEach((it) => purge(it.id)); render(); });
+      return;
+    }
+    const id = btn.closest("[data-id]").dataset.id;
+    const cur = items.get(id); if (!cur) return;
+    if (act === "detail") { openSet.has(id) ? openSet.delete(id) : openSet.add(id); render(); }
+    else if (act === "bell") { commit(id, Object.assign({}, cur, {remind: cur.remind != null ? null : 0})); render(); }
+    else if (act === "edit-time") {
+      editingTime = id; render();
+      const inp = document.querySelector('#content [data-id="' + CSS.escape(id) + '"] .pill-input');
+      if (inp) { inp.focus(); inp.select(); }
+    }
+    else if (act === "timer") { cur.timerStart ? pauseTimer(id) : startTimer(id); }
+    else if (act === "reset-time") { commit(id, Object.assign({}, cur, {spent: 0})); render(); }
+    else if (act === "del") {
+      if (cur.timerStart) pauseTimer(id);
+      commit(id, Object.assign({}, items.get(id), {deleted: true})); openSet.delete(id); render();
+      showToast("삭제됨", "되돌리기", () => { const c = items.get(id); if (c) { commit(id, Object.assign({}, c, {deleted: false})); render(); } });
+    }
+    else if (act === "restore") { commit(id, Object.assign({}, cur, {deleted: false})); render(); }
+    else if (act === "purge") { showToast("영구 삭제?", "삭제", () => { purge(id); render(); }); }
+  });
+
+  function finishTimeEdit(inp, save){
+    if (!editingTime || !inp) return;
+    const id = editingTime;
+    editingTime = null;
+    const cur = items.get(id);
+    if (save && cur) {
+      const t = normTime(inp.value);
+      if (t === null) showToast("시간 형식: 18:30");
+      else if (t !== (cur.time || "")) {
+        const next = Object.assign({}, cur, {time: t});
+        if (t && !cur.time && cur.remind == null) next.remind = 0;
+        commit(id, next);
+      }
+    }
+    render();
+  }
+  content.addEventListener("keydown", (e) => {
+    if (!e.target.classList.contains("pill-input")) return;
+    if (e.key === "Enter") { e.preventDefault(); finishTimeEdit(e.target, true); }
+    else if (e.key === "Escape") { e.preventDefault(); finishTimeEdit(e.target, false); }
+  });
+  content.addEventListener("focusout", (e) => {
+    if (e.target.classList && e.target.classList.contains("pill-input")) finishTimeEdit(e.target, true);
+  });
+
+  // ---- manual reorder (pointer drag on the handle; works with touch) ----
+  content.addEventListener("pointerdown", (e) => {
+    const h = e.target.closest(".handle"); if (!h) return;
+    e.preventDefault();
+    const li = h.closest("li.row");
+    drag = {li, ul: li.parentElement, moved: false};
+    li.classList.add("dragging");
+    try { h.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  content.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    const y = e.clientY;
+    const sibs = [...drag.ul.children].filter((x) => x !== drag.li);
+    let before = null;
+    for (const s of sibs) { const r = s.getBoundingClientRect(); if (y < r.top + r.height / 2) { before = s; break; } }
+    if (before !== drag.li.nextElementSibling && before !== drag.li) {
+      drag.ul.insertBefore(drag.li, before);
+      drag.moved = true;
+    }
+  });
+  function endDrag(){
+    if (!drag) return;
+    const {li, moved} = drag;
+    li.classList.remove("dragging");
+    drag = null;
+    if (moved) {
+      const id = li.dataset.id;
+      const prev = li.previousElementSibling && items.get(li.previousElementSibling.dataset.id);
+      const next = li.nextElementSibling && items.get(li.nextElementSibling.dataset.id);
+      let o;
+      if (prev && next) o = (ord(prev) + ord(next)) / 2;
+      else if (prev) o = ord(prev) + 1000;
+      else if (next) o = ord(next) - 1000;
+      const cur = items.get(id);
+      if (cur && o != null) commit(id, Object.assign({}, cur, {order: o}));
+    }
+    renderPending = false;
+    render();
+  }
+  content.addEventListener("pointerup", endDrag);
+  content.addEventListener("pointercancel", endDrag);
+
+  // ================= timer =================
+  function runningItem(){
+    let best = null;
+    for (const [id, d] of items) if (d.timerStart && !d.deleted && !d.done && (!best || d.timerStart > best.timerStart)) best = Object.assign({id}, d);
+    return best;
+  }
+  function startTimer(id){
+    const now = Date.now();
+    for (const [oid, d] of items) if (oid !== id && d.timerStart) commit(oid, Object.assign({}, d, {spent: (d.spent || 0) + now - d.timerStart, timerStart: null}));
+    const d = items.get(id);
+    commit(id, Object.assign({}, d, {timerStart: now}));
+    unlockAudio();
+    render();
+  }
+  function pauseTimer(id){
+    const d = items.get(id); if (!d || !d.timerStart) return;
+    commit(id, Object.assign({}, d, {spent: (d.spent || 0) + Date.now() - d.timerStart, timerStart: null}));
+    render();
+  }
+  function finishTimer(id){
+    const d = items.get(id); if (!d) return;
+    const now = Date.now();
+    const spent = (d.spent || 0) + (d.timerStart ? now - d.timerStart : 0);
+    commit(id, Object.assign({}, d, {spent, timerStart: null, done: true, doneAt: now}));
+    render();
+    showToast("완료 · " + fmtMin(spent));
+  }
+  function updateTimerBar(){
+    const r = runningItem();
+    const bar = $("#timerbar");
+    document.body.classList.toggle("has-timer", !!r);
+    if (!r) { bar.hidden = true; return; }
+    bar.hidden = false;
+    bar.dataset.id = r.id;
+    $("#tbTitle").textContent = r.title || "(제목 없음)";
+    const el = elapsed(r);
+    const goal = r.timerGoal ? r.timerGoal * 60000 : 0;
+    if (goal) {
+      const left = goal - el;
+      $("#tbTime").innerHTML = (left >= 0 ? fmtDur(left) : "+" + fmtDur(-left)) + '<span class="tb-sub">' + (left >= 0 ? "남음 · 누적 " : "목표 초과 · 누적 ") + fmtDur(el) + "</span>";
+      if (left < 0) {
+        const key = r.id + "|goal|" + r.timerGoal + "|" + r.timerStart;
+        if (!fired[key]) { fired[key] = Date.now(); lsSet(FIRED_KEY, fired); alertUser("목표 " + r.timerGoal + "분이 지났어요", r.title); }
+      }
+    } else {
+      $("#tbTime").textContent = fmtDur(el);
+    }
+    $("#tbLabel").textContent = "진행 중";
+    const g = $("#tbGoal");
+    if (document.activeElement !== g) g.value = r.timerGoal ? String(r.timerGoal) : "";
+  }
+  $("#tbPause").addEventListener("click", () => { const id = $("#timerbar").dataset.id; if (id) pauseTimer(id); });
+  $("#tbDone").addEventListener("click", () => { const id = $("#timerbar").dataset.id; if (id) finishTimer(id); });
+  $("#tbGoal").addEventListener("change", (e) => {
+    const id = $("#timerbar").dataset.id; const d = items.get(id); if (!d) return;
+    commit(id, Object.assign({}, d, {timerGoal: e.target.value ? Number(e.target.value) : null}));
+    updateTimerBar();
+  });
+
+  // ================= alarms =================
+  let actx = null;
+  function unlockAudio(){
+    try {
+      if (!actx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) actx = new AC(); }
+      if (actx && actx.state === "suspended") actx.resume();
+    } catch (e) {}
+  }
+  document.addEventListener("pointerdown", unlockAudio, true);
+  document.addEventListener("keydown", unlockAudio, true);
+  function beep(){
+    try {
+      if (!actx || actx.state !== "running") return;
+      const t0 = actx.currentTime;
+      [0, 0.28, 0.56].forEach((off) => {
+        const o = actx.createOscillator(), g = actx.createGain();
+        o.type = "sine"; o.frequency.value = 880;
+        g.gain.setValueAtTime(0.0001, t0 + off);
+        g.gain.exponentialRampToValueAtTime(0.25, t0 + off + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + off + 0.2);
+        o.connect(g); g.connect(actx.destination);
+        o.start(t0 + off); o.stop(t0 + off + 0.22);
+      });
+    } catch (e) {}
+  }
+  function alertUser(head, body){
+    beep();
+    try {
+      if ("Notification" in window && Notification.permission === "granted") {
+        if (navigator.serviceWorker && navigator.serviceWorker.controller) navigator.serviceWorker.ready.then((r) => r.showNotification(head, {body: body || "", icon: "icons/icon-192.png"})).catch(() => {});
+        else new Notification(head, {body: body || ""});
+      }
+    } catch (e) {}
+    showToast(head + (body ? " · " + body : ""), "확인", null, true);
+  }
+  function checkReminders(){
+    const now = Date.now();
+    for (const [id, d] of items) {
+      if (d.done || d.deleted || d.remind == null) continue;
+      const w = whenTs(d); if (w == null) continue;
+      const at = w - d.remind * 60000;
+      if (now < at || now - at > 6 * 3600000) continue;
+      const key = id + "|" + at;
+      if (fired[key]) continue;
+      fired[key] = now; lsSet(FIRED_KEY, fired);
+      alertUser(d.remind ? (REMIND.find(([k]) => k === String(d.remind)) || ["", ""])[1] + " 알림" : "지금 할 일", (d.title || "") + " · " + fmtTime(d.time));
+    }
+    const cutoff = now - 3 * 86400000;
+    let pruned = false;
+    for (const k of Object.keys(fired)) if (fired[k] < cutoff) { delete fired[k]; pruned = true; }
+    if (pruned) lsSet(FIRED_KEY, fired);
+  }
+  function syncAlarmBtn(){
+    const on = lsGet(ALARM_KEY, false);
+    const b = $("#alarmBtn");
+    b.classList.toggle("on", !!on);
+    b.textContent = on ? "알림 켜짐" : "알림 켜기";
+  }
+  $("#alarmBtn").addEventListener("click", async () => {
+    unlockAudio();
+    lsSet(ALARM_KEY, true);
+    syncAlarmBtn();
+    setTimeout(beep, 120);
+    let msg = "알림 켜짐";
+    try {
+      if ("Notification" in window && Notification.permission !== "granted") {
+        const p = await Notification.requestPermission();
+        if (p === "granted") msg = "알림 켜짐";
+      }
+    } catch (e) {}
+    showToast(msg);
+  });
+
+  // ================= categories =================
+  let catModalFor = null;
+  function nextColor(){ const used = settings.categories.map((c) => c.color.toLowerCase()); return PALETTE.find((c) => !used.includes(c)) || PALETTE[settings.categories.length % PALETTE.length]; }
+  function openCatModal(forItem){
+    catModalFor = forItem || null;
+    renderCatModal();
+    $("#catModal").hidden = false;
+    $("#newCatColor").value = nextColor();
+    renderSwatches();
+    $("#newCatName").focus();
+  }
+  function closeCatModal(){ $("#catModal").hidden = true; catModalFor = null; render(); }
+  function renderCatModal(){
+    $("#catEdit").innerHTML = settings.categories.length
+      ? settings.categories.map((c) =>
+          '<li data-cat-id="' + esc(c.id) + '"><input type="color" data-cf="color" value="' + esc(c.color) + '" aria-label="' + esc(c.name) + ' 색">' +
+          '<input type="text" data-cf="name" value="' + esc(c.name) + '" aria-label="카테고리 이름">' +
+          '<button type="button" class="mini danger always" data-cact="del">삭제</button></li>').join("")
+      : "";
+  }
+  function renderSwatches(){
+    const cur = $("#newCatColor").value.toLowerCase();
+    $("#swatches").innerHTML = PALETTE.map((c) => '<button type="button" data-swatch="' + c + '" style="--cat:' + c + '" aria-label="색 ' + c + '" aria-pressed="' + (c === cur) + '"></button>').join("");
+  }
+  $("#swatches").addEventListener("click", (e) => { const b = e.target.closest("[data-swatch]"); if (!b) return; $("#newCatColor").value = b.dataset.swatch; renderSwatches(); });
+  $("#newCatColor").addEventListener("input", renderSwatches);
+  $("#manageCats").addEventListener("click", () => openCatModal());
+  $("#catClose").addEventListener("click", closeCatModal);
+  $("#catModal").addEventListener("click", (e) => { if (e.target.id === "catModal") closeCatModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#catModal").hidden) closeCatModal(); });
+  $("#catAdd").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = $("#newCatName").value.trim();
+    if (!name) { $("#newCatName").focus(); return; }
+    const existing = settings.categories.find((c) => c.name === name);
+    const c = existing || {id: newId("c"), name, color: $("#newCatColor").value};
+    if (!existing) commitSettings({categories: settings.categories.concat([c])});
+    if (catModalFor && items.get(catModalFor)) commit(catModalFor, Object.assign({}, items.get(catModalFor), {categoryId: c.id}));
+    $("#newCatName").value = "";
+    $("#newCatColor").value = nextColor();
+    renderSwatches();
+    renderCatModal();
+    if (catModalFor) { closeCatModal(); return; }
+    newCatId = c.id; renderAddSelects();
+  });
+  $("#catEdit").addEventListener("input", (e) => {
+    const f = e.target.dataset.cf; if (!f) return;
+    const id = e.target.closest("[data-cat-id]").dataset.catId;
+    commitSettings({categories: settings.categories.map((c) => c.id === id ? Object.assign({}, c, {[f]: e.target.value}) : c)});
+  });
+  $("#catEdit").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-cact]"); if (!b) return;
+    const li = b.closest("[data-cat-id]"); const id = li.dataset.catId;
+    const idx = settings.categories.findIndex((c) => c.id === id);
+    const removed = settings.categories[idx];
+    commitSettings({categories: settings.categories.filter((c) => c.id !== id)});
+    if (filterCat === id) filterCat = null;
+    renderCatModal();
+    showToast("'" + (removed.name || "카테고리") + "' 삭제됨", "되돌리기", () => {
+      const cats = settings.categories.slice(); cats.splice(Math.min(idx, cats.length), 0, removed);
+      commitSettings({categories: cats}); renderCatModal(); render();
+    });
+  });
+  $("#catList").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-cat]"); if (!b) return;
+    const v = b.dataset.cat;
+    filterCat = v === "" ? null : (filterCat === v ? null : v);
+    if (filterCat && filterCat !== "none") newCatId = filterCat;
+    render();
+  });
+
+  function migrate(){
+    if (migrated) return;
+    migrated = true;
+    let cats = settings.categories.map((c) => { const k = OLD_PALETTE.indexOf(c.color.toLowerCase()); return k >= 0 ? Object.assign({}, c, {color: PALETTE[k]}) : c; });
+    let changed = cats.some((c, i) => c.color !== settings.categories[i].color);
+    for (const [id, d] of items) {
+      const s = (d.subject || "").trim();
+      if (!s || d.categoryId) continue;
+      let c = cats.find((x) => x.name === s);
+      if (!c) { const used = cats.map((x) => x.color); c = {id: newId("c"), name: s, color: PALETTE.find((x) => !used.includes(x)) || PALETTE[cats.length % PALETTE.length]}; cats.push(c); changed = true; }
+      commit(id, Object.assign({}, d, {categoryId: c.id, subject: ""}));
+    }
+    if (changed) commitSettings({categories: cats});
+    render();
+  }
+
+  // ================= toast =================
+  let toastTimer = null;
+  function showToast(msg, actLabel, fn, sticky){
+    const t = $("#toast");
+    t.classList.toggle("alarm", !!sticky);
+    $("#toastMsg").textContent = msg;
+    const a = $("#toastAct");
+    a.textContent = actLabel || "";
+    a.hidden = !actLabel;
+    a.onclick = () => { t.hidden = true; if (fn) fn(); };
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    if (!sticky) toastTimer = setTimeout(() => { t.hidden = true; }, 6000);
+  }
+
+  // ================= nav, backup =================
+  function go(v){
+    view = v;
+    try { history.replaceState(null, "", "#" + v); } catch (e) {}
+    setNewDate(defaultDateFor(v));
+    render();
+  }
+  $("#nav").addEventListener("click", (e) => { const b = e.target.closest("[data-view]"); if (b) go(b.dataset.view); });
+  window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (VIEWS[h] && h !== view) go(h); });
+
+  // ================= cover photo =================
+  let coverMoving = false, coverDrag = null, coverY = null;
+  const canUpload = () => !!(sb && uid && mode === "cloud");
+  function renderCover(){
+    const box = $("#cover"), img = $("#coverImg");
+    const url = settings.coverUrl;
+    box.hidden = !canUpload() && !url;
+    box.classList.toggle("empty", !url);
+    $("#coverAdd").hidden = !canUpload();
+    $("#coverDel").hidden = !canUpload() || !url;
+    $("#coverMove").hidden = !url;
+    if (!url) { coverMoving = false; img.hidden = true; img.removeAttribute("src"); }
+    else {
+      if (img.getAttribute("src") !== url) img.src = url;
+      img.hidden = false;
+      if (!coverDrag) img.style.objectPosition = "50% " + (coverY != null ? coverY : settings.coverY) + "%";
+    }
+    box.classList.toggle("moving", coverMoving);
+  }
+  $("#coverImg").addEventListener("error", () => { $("#coverImg").hidden = true; });
+  async function shrinkImage(file){
+    try {
+      if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+      const bmp = await createImageBitmap(file);
+      const max = 2400;
+      if (bmp.width <= max && file.size < 1500000) return file;
+      const k = Math.min(1, max / bmp.width);
+      const c = document.createElement("canvas");
+      c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+      c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+      const blob = await new Promise((res) => c.toBlob(res, "image/jpeg", 0.86));
+      return blob && blob.size < file.size ? blob : file;
+    } catch (e) { return file; }
+  }
+  $("#coverFile").addEventListener("change", async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file || !canUpload()) return;
+    if (!navigator.onLine) { showToast("오프라인 상태예요"); return; }
+    const box = $("#cover");
+    box.classList.add("busy");
+    try {
+      const blob = await shrinkImage(file);
+      const type = blob.type || "image/jpeg";
+      const ext = type === "image/png" ? "png" : type === "image/webp" ? "webp" : type === "image/gif" ? "gif" : "jpg";
+      const path = uid + "/" + newId("cover") + "." + ext;
+      const up = await sb.storage.from("covers").upload(path, blob, {contentType: type, cacheControl: "31536000", upsert: false});
+      if (up.error) throw up.error;
+      const sg = await sb.storage.from("covers").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (sg.error) throw sg.error;
+      const oldPath = settings.coverPath;
+      coverY = null;
+      commitSettings({coverPath: path, coverUrl: sg.data.signedUrl, coverY: 50});
+      render();
+      if (oldPath && oldPath !== path) sb.storage.from("covers").remove([oldPath]).catch(() => {});
+    } catch (err) {
+      console.warn("cover", err);
+      showToast(/size|large/i.test(String(err && err.message)) ? "사진이 너무 커요" : "사진을 올리지 못했어요");
+    } finally {
+      box.classList.remove("busy");
+    }
+  });
+  $("#coverDel").addEventListener("click", () => {
+    const oldPath = settings.coverPath; if (!settings.coverUrl) return;
+    showToast("커버 사진 삭제?", "삭제", () => {
+      commitSettings({coverPath: "", coverUrl: "", coverY: 50});
+      render();
+      if (oldPath && sb) sb.storage.from("covers").remove([oldPath]).catch(() => {});
+    });
+  });
+  $("#coverMove").addEventListener("click", () => { coverMoving = !coverMoving; renderCover(); });
+  $("#coverImg").addEventListener("pointerdown", (e) => {
+    if (!coverMoving) return;
+    e.preventDefault();
+    const img = e.currentTarget, box = $("#cover");
+    const scale = box.clientWidth / (img.naturalWidth || box.clientWidth);
+    const overflow = Math.max(1, (img.naturalHeight || box.clientHeight) * scale - box.clientHeight);
+    coverDrag = {y: e.clientY, start: coverY != null ? coverY : settings.coverY, overflow};
+    try { img.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  $("#coverImg").addEventListener("pointermove", (e) => {
+    if (!coverDrag) return;
+    coverY = Math.max(0, Math.min(100, coverDrag.start - (e.clientY - coverDrag.y) / coverDrag.overflow * 100));
+    e.currentTarget.style.objectPosition = "50% " + coverY + "%";
+  });
+  function endCoverDrag(){
+    if (!coverDrag) return;
+    coverDrag = null;
+    if (coverY != null && Math.abs(coverY - settings.coverY) > 0.1) commitSettings({coverY: Math.round(coverY * 10) / 10});
+    coverY = null;
+    renderCover();
+  }
+  $("#coverImg").addEventListener("pointerup", endCoverDrag);
+  $("#coverImg").addEventListener("pointercancel", endCoverDrag);
+
+  $("#backupBtn").addEventListener("click", () => {
+    const payload = JSON.stringify({exportedAt: new Date().toISOString(), settings, items: Object.fromEntries(items)}, null, 2);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([payload], {type: "application/json"}));
+    a.download = "planner-backup-" + today() + ".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  });
+  $("#importFile").addEventListener("change", async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    let obj;
+    try { obj = JSON.parse(await file.text()); } catch (err) { showToast("백업 파일이 아니에요"); return; }
+    const src = obj && typeof obj.items === "object" ? obj.items : null;
+    if (!src) { showToast("백업 파일이 아니에요"); return; }
+    let n = 0;
+    for (const [id, d] of Object.entries(src)) {
+      if (!d || typeof d !== "object" || d.purged || id === SETTINGS_ID) continue;
+      const cur = items.get(id);
+      if (cur && (cur.updatedAt || 0) >= (d.updatedAt || 0)) continue;
+      const data = Object.assign({}, d, {updatedAt: Math.max(d.updatedAt || 0, Date.now())});
+      items.set(id, data);
+      outbox[id] = {op: "set", data};
+      n++;
+    }
+    const incoming = normSettings(obj.settings || {});
+    const have = new Set(settings.categories.map((c) => c.id));
+    const extra = incoming.categories.filter((c) => !have.has(c.id));
+    if (extra.length) commitSettings({categories: settings.categories.concat(extra)});
+    persist();
+    scheduleFlush(200);
+    migrated = false;
+    migrate();
+    showToast(n + "개 가져옴");
+  });
+
+  const now0 = new Date();
+  $("#todayLabel").innerHTML = '<span class="big">' + pad(now0.getMonth() + 1) + "." + pad(now0.getDate()) + '</span><span class="dow">' + WD_EN[now0.getDay()] + "<br>" + WD[now0.getDay()] + "요일</span>";
+
+  // ================= cloud =================
+  let pulledAt = lsGet(PULL_KEY, null);
+  let pulling = false, pullAgain = false, firstPullDone = false;
+  function schedulePull(d){ clearTimeout(pullTimer); pullTimer = setTimeout(pull, d == null ? 400 : d); }
+  async function pull(){
+    if (!sb || !uid || !navigator.onLine) { updateStatus(); return; }
+    if (pulling) { pullAgain = true; return; }
+    pulling = true;
+    try {
+      // re-read a few seconds of overlap so a write that committed late is never skipped
+      let since = pulledAt && pulledAt.uid === uid ? new Date(Date.parse(pulledAt.ts) - 5000).toISOString() : "1970-01-01T00:00:00.000Z";
+      let changed = false;
+      for (;;) {
+        const {data, error} = await sb.from("items").select("id,data,server_ts").gt("server_ts", since).order("server_ts", {ascending: true}).limit(1000);
+        if (error) throw error;
+        for (const r of data) {
+          since = r.server_ts;
+          if (outbox[r.id]) continue;
+          if (!r.data || r.data.purged) { if (items.delete(r.id)) changed = true; }
+          else { items.set(r.id, r.data); changed = true; }
+        }
+        if (data.length < 1000) break;
+      }
+      const sres = await sb.from("settings").select("data").maybeSingle();
+      if (sres.error) throw sres.error;
+      if (sres.data && sres.data.data && !outbox[SETTINGS_ID]) {
+        const next = normSettings(sres.data.data);
+        if (JSON.stringify(next) !== JSON.stringify(settings)) { settings = next; changed = true; }
+      }
+      pulledAt = {uid, ts: since};
+      lsSet(PULL_KEY, pulledAt);
+      if (lastError === "offline") lastError = null;
+      if (changed) { lsSet(CACHE_KEY, Object.fromEntries(items)); lsSet(SETTINGS_KEY, settings); }
+      if (!firstPullDone) { firstPullDone = true; migrate(); }
+      if (changed && !drag && !editingTime && $("#catModal").hidden) render();
+    } catch (e) {
+      if (isNetErr(e)) lastError = "offline";
+      console.warn("pull", e);
+    }
+    pulling = false;
+    updateStatus();
+    if (pullAgain) { pullAgain = false; schedulePull(200); }
+  }
+  let channel = null;
+  function subscribeRealtime(){
+    try {
+      if (channel) sb.removeChannel(channel);
+      channel = sb.channel("planner-" + uid)
+        .on("postgres_changes", {event: "*", schema: "public", table: "items", filter: "user_id=eq." + uid}, () => schedulePull(300))
+        .on("postgres_changes", {event: "*", schema: "public", table: "settings", filter: "user_id=eq." + uid}, () => schedulePull(300))
+        .subscribe();
+    } catch (e) { console.warn("realtime", e); }
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { schedulePull(50); scheduleFlush(100); } });
+  setInterval(() => { if (!document.hidden) pull(); }, 60000);
+
+  // ---- auth ----
+  let authMode = "login";
+  function showAuth(msg){
+    $("#auth").hidden = false;
+    $("#authMsg").textContent = msg || "";
+    $("#authMsg").className = "auth-msg";
+    setTimeout(() => $("#authEmail").focus(), 50);
+  }
+  $("#authSwitch").addEventListener("click", () => {
+    authMode = authMode === "login" ? "signup" : "login";
+    $("#authGo").textContent = authMode === "login" ? "로그인" : "가입하기";
+    $("#authSwitch").textContent = authMode === "login" ? "가입하기" : "로그인";
+    $("#authPw").setAttribute("autocomplete", authMode === "login" ? "current-password" : "new-password");
+    $("#authPw").placeholder = authMode === "login" ? "비밀번호" : "비밀번호 (6자 이상)";
+    $("#authMsg").textContent = "";
+  });
+  $("#authForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = $("#authMsg");
+    msg.className = "auth-msg";
+    if (!navigator.onLine) { msg.textContent = "인터넷 연결이 필요해요"; return; }
+    const email = $("#authEmail").value.trim(), password = $("#authPw").value;
+    $("#authGo").disabled = true;
+    try {
+      if (authMode === "signup") {
+        const {data, error} = await sb.auth.signUp({email, password});
+        if (error) throw error;
+        if (data.session) onSignedIn(data.session);
+        else { msg.className = "auth-msg ok"; msg.textContent = "메일함의 확인 링크를 누른 뒤 로그인해 주세요"; authMode = "signup"; $("#authSwitch").click(); }
+      } else {
+        const {data, error} = await sb.auth.signInWithPassword({email, password});
+        if (error) throw error;
+        onSignedIn(data.session);
+      }
+    } catch (err) {
+      const m = String(err && err.message || "");
+      msg.textContent = /confirm/i.test(m) ? "메일 확인이 필요해요" : /already/i.test(m) ? "이미 가입된 이메일이에요" : /password/i.test(m) && authMode === "signup" ? "비밀번호는 6자 이상" : /invalid/i.test(m) ? "이메일 또는 비밀번호가 맞지 않아요" : "로그인하지 못했어요";
+    } finally {
+      $("#authGo").disabled = false;
+    }
+  });
+  function onSignedIn(session){
+    if (!session || !session.user) return;
+    const newUid = session.user.id;
+    const lastUid = lsGet(LAST_UID_KEY, null);
+    if (lastUid && lastUid !== newUid) {
+      items = new Map(); outbox = {}; settings = normSettings(null); pulledAt = null;
+      persist();
+    } else if (!lastUid) {
+      for (const [id, d] of items) if (!outbox[id]) outbox[id] = {op: "set", data: d};
+      if (settings.categories.length && !outbox[SETTINGS_ID]) outbox[SETTINGS_ID] = {op: "set", data: settings};
+      persist();
+    }
+    lsSet(LAST_UID_KEY, newUid);
+    uid = newUid;
+    mode = "cloud";
+    $("#auth").hidden = true;
+    $("#acctEmail").textContent = session.user.email || "";
+    $("#logoutBtn").hidden = false;
+    subscribeRealtime();
+    flush();
+    pull();
+    render();
+  }
+  $("#logoutBtn").addEventListener("click", () => {
+    showToast("로그아웃?", "로그아웃", async () => {
+      try { await sb.auth.signOut(); } catch (e) {}
+      uid = null; mode = "loading";
+      if (channel) { try { sb.removeChannel(channel); } catch (e) {} channel = null; }
+      $("#logoutBtn").hidden = true; $("#acctEmail").textContent = "";
+      showAuth();
+      render();
+    });
+  });
+
+  async function start(){
+    setNewDate(defaultDateFor(view));
+    syncNewRemind();
+    syncAlarmBtn();
+    render();
+    setInterval(() => { if (!document.hidden || runningItem()) updateTimerBar(); }, 1000);
+    setInterval(checkReminders, 10000);
+    setTimeout(checkReminders, 1500);
+    if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {});
+    const cfg = window.PLANNER_CONFIG || {};
+    if (!window.supabase || !cfg.url || !cfg.anonKey || /YOUR_/.test(cfg.url + cfg.anonKey)) { mode = "local"; migrate(); render(); return; }
+    sb = window.supabase.createClient(cfg.url, cfg.anonKey, {auth: {persistSession: true, autoRefreshToken: true, storageKey: AUTH_KEY, detectSessionInUrl: true}});
+    sb.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" && uid) { uid = null; mode = "loading"; $("#logoutBtn").hidden = true; showAuth("다시 로그인해 주세요"); updateStatus(); }
+      else if (session && session.user && session.user.id !== uid) setTimeout(() => onSignedIn(session), 0);
+    });
+    // Works offline: the stored session is enough to show this account's data and queue changes.
+    const stored = lsGet(AUTH_KEY, null);
+    const u = stored && (stored.user || (stored.currentSession && stored.currentSession.user));
+    if (u && u.id) onSignedIn({user: u});
+    else { mode = "loading"; updateStatus(); showAuth(); }
+  }
+  start();
+})();
+</script>
+</body>
+</html>
