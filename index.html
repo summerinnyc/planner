@@ -153,10 +153,11 @@ li.row.dragging{opacity:.55}
 .check .box{width:17px;height:17px;border:1.6px solid var(--ink);position:relative;background:var(--paper)}
 .check input:focus-visible + .box{outline:2px dashed var(--ink);outline-offset:3px}
 .body{min-width:0;display:flex;flex-direction:column;gap:2px}
-.line1{display:flex;align-items:center;gap:8px;min-width:0}
-.title{flex:1;min-width:0;border:0;border-bottom:1px solid transparent;background:transparent;padding:5px 2px 3px;font-size:16px;outline:none}
+.line1{display:flex;align-items:flex-start;gap:8px;min-width:0}
+.line1 > .pill,.line1 > .acts{margin-top:5px}
+.title{flex:1;min-width:0;border:0;border-bottom:1px solid transparent;background:transparent;padding:5px 2px 3px;font-size:16px;line-height:1.45;outline:none;resize:none;overflow:hidden;display:block;font-family:inherit;color:inherit;overflow-wrap:anywhere;word-break:keep-all;white-space:pre-wrap}
 .title:focus{border-bottom-color:var(--ink)}
-.done-title{flex:1;min-width:0;padding:5px 2px 3px;font-size:16px;overflow-wrap:anywhere}
+.done-title{flex:1;min-width:0;padding:5px 2px 3px;font-size:16px;line-height:1.45;overflow-wrap:anywhere;word-break:keep-all}
 .acts{display:flex;align-items:center;gap:8px;flex:0 0 auto}
 .meta{display:flex;flex-wrap:wrap;gap:3px 12px;align-items:center;padding-left:2px;font-size:12.5px}
 li.row.done .meta{opacity:.7}
@@ -175,7 +176,8 @@ li.row.done .meta{opacity:.7}
 .pill.editing{border-style:dashed}
 .pill-input{width:46px;border:0;background:transparent;padding:0;font:inherit;color:inherit;outline:none;text-align:center}
 li.row.done .pill{border-color:var(--line);color:var(--muted)}
-.add-line .pill{font-size:13.5px;padding:2px 11px}
+.add-line .pill{font-size:13.5px;padding:2px 11px;cursor:pointer}
+.add-line .pill:hover{text-decoration:line-through}
 .mini{border:0;background:transparent;font-size:12.5px;color:var(--muted);padding:0}
 .mini:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .mini.danger:hover{color:var(--alert)}
@@ -336,7 +338,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     <form class="add" id="addForm" autocomplete="off">
       <div class="catpick" id="catPick" role="group" aria-label="카테고리 선택"></div>
       <div class="add-line">
-        <span class="pill" id="timePreview" hidden></span>
+        <span class="pill" id="timePreview" role="button" tabindex="0" title="시간 빼기" hidden></span>
         <input class="title-in" id="newTitle" placeholder="할 일" aria-label="새 할 일 (예: 18:00 수업 듣기)">
         <button class="primary" type="submit">적기</button>
       </div>
@@ -700,7 +702,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     }
     const title = it.done
       ? '<div class="done-title"><span>' + esc(it.title || "(제목 없음)") + "</span></div>"
-      : '<input class="title" data-field="title" value="' + esc(it.title) + '" aria-label="할 일 제목">';
+      : '<textarea class="title" data-field="title" rows="1" aria-label="할 일 제목">' + esc(it.title) + "</textarea>";
     const detail = isOpen ? (
       '<div class="detail">' +
         '<label>날짜<input type="date" data-field="date" value="' + esc(it.date || "") + '"></label>' +
@@ -774,6 +776,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
         : empty("비어 있음");
     }
     $("#content").innerHTML = html;
+    fitTitles();
     const catName = filterCat === "none" ? "미분류" : (filterCat && (settings.categories.find((c) => c.id === filterCat) || {}).name);
     $("#viewTitle").textContent = VIEWS[view] + (catName ? " · " + catName : "");
     $("#addForm").hidden = (view === "done" || view === "trash");
@@ -827,12 +830,52 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       b.setAttribute("aria-pressed", on ? "true" : "false");
     });
   }
+  let newTime = "";
   function syncNewRemind(){
-    const p = parseTime($("#newTitle").value);
     const el = $("#timePreview");
-    el.hidden = !p;
-    el.textContent = p ? p.time : "";
+    el.hidden = !newTime;
+    el.textContent = newTime;
   }
+  // Take the time out of the text once it is clearly finished ("18:00", "6시 반", "18시 수…"),
+  // so it shows only once, as the pill.
+  function extractTime(){
+    const inp = $("#newTitle");
+    if (newTime) return;
+    const v = inp.value;
+    const m = TIME_RE.exec(v);
+    if (!m) return;
+    const after = v.slice(m.index + m[0].length);
+    const colon = m[4] != null, full = m[5] != null || !!m[6];
+    const done = colon ? (after === "" || /^\s/.test(after)) : (/^\s+[^\d\s]/.test(after) || (full && /^\s/.test(after)));
+    if (!done) return;
+    const p = parseTime(v);
+    if (!p) return;
+    const start = m.index + m[1].length, end = m.index + m[0].length;
+    const caret = inp.selectionStart;
+    let text = v.slice(0, start) + v.slice(end);
+    let cut = end - start;
+    if (start === 0) { const lead = text.match(/^\s*/)[0].length; text = text.slice(lead); cut += lead; }
+    else if (/\s$/.test(text.slice(0, start)) && /^\s/.test(text.slice(start))) { text = text.slice(0, start) + text.slice(start + 1); cut += 1; }
+    newTime = p.time;
+    inp.value = text;
+    const pos = caret == null ? text.length : caret >= end ? Math.max(0, caret - cut) : Math.min(caret, start);
+    try { inp.setSelectionRange(pos, pos); } catch (e) {}
+    syncNewRemind();
+  }
+  $("#newTitle").addEventListener("input", (e) => {
+    if (e.isComposing) return;
+    const inp = e.target, lead = inp.value.match(/^\s+/);
+    if (lead) { const c = inp.selectionStart; inp.value = inp.value.slice(lead[0].length); try { inp.setSelectionRange(Math.max(0, c - lead[0].length), Math.max(0, c - lead[0].length)); } catch (err) {} }
+    extractTime();
+  });
+  $("#newTitle").addEventListener("compositionend", () => setTimeout(extractTime, 0));
+  function clearNewTime(){ newTime = ""; syncNewRemind(); $("#newTitle").focus(); }
+  $("#timePreview").addEventListener("click", clearNewTime);
+  $("#timePreview").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " " || e.key === "Backspace" || e.key === "Delete") { e.preventDefault(); clearNewTime(); } });
+  $("#newTitle").addEventListener("keydown", (e) => {
+    const inp = e.target;
+    if (e.key === "Backspace" && newTime && inp.selectionStart === 0 && inp.selectionEnd === 0) { e.preventDefault(); clearNewTime(); }
+  });
   const defaultDateFor = (v) => (v === "today" ? today() : v === "upcoming" ? addDays(today(), 1) : "");
   document.querySelectorAll("[data-quick]").forEach((b) => b.addEventListener("click", () => {
     const q = b.dataset.quick;
@@ -850,9 +893,9 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     e.preventDefault();
     const raw = $("#newTitle").value.trim();
     if (!raw) { $("#newTitle").focus(); return; }
-    const parsed = parseTime(raw);
+    const parsed = newTime ? null : parseTime(raw);
     const title = parsed ? parsed.title : raw;
-    const time = parsed ? parsed.time : "";
+    const time = newTime || (parsed ? parsed.time : "");
     const now = Date.now();
     commit(newId(), {
       kind: "task", title, note: "",
@@ -863,6 +906,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       spent: 0, timerStart: null, timerGoal: null,
     });
     $("#newTitle").value = ""; $("#newDue").value = "";
+    newTime = "";
     syncNewRemind();
     render();
     $("#newTitle").focus();
@@ -871,9 +915,17 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
 
   // ================= list interactions =================
   const content = $("#content");
+  function fitTitles(root){
+    (root || content).querySelectorAll("textarea.title").forEach((t) => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; });
+  }
+  window.addEventListener("resize", () => fitTitles());
+  content.addEventListener("keydown", (e) => {
+    if (e.target.classList && e.target.classList.contains("title") && e.key === "Enter" && !e.isComposing) { e.preventDefault(); e.target.blur(); }
+  });
   content.addEventListener("input", (e) => {
     const f = e.target.dataset.field;
     if (f !== "title" && f !== "note") return;
+    if (f === "title") { e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; if (/\n/.test(e.target.value)) e.target.value = e.target.value.replace(/\s*\n\s*/g, " "); }
     const id = e.target.closest("[data-id]").dataset.id;
     const cur = items.get(id); if (!cur) return;
     commit(id, Object.assign({}, cur, {[f]: e.target.value}));
