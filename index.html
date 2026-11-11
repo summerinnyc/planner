@@ -313,6 +313,64 @@ body.has-timer .toast{bottom:86px}
 .blk span{display:block;font-size:10.5px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
 .now-line{position:absolute;left:0;right:0;height:2px;background:var(--alert);z-index:2;pointer-events:none}
 .now-line::before{content:"";position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--alert)}
+.cal-ev.exam{border-left-color:var(--ink);background:var(--ink);color:var(--paper);font-weight:600}
+.cal-dots i.exam{background:var(--ink);border-radius:1px;transform:rotate(45deg)}
+.blk.exam{background:var(--ink);color:var(--paper);border-left:3px solid var(--alert)}
+.class-item.exam{background:var(--ink);color:var(--paper);border-left-color:var(--alert)}
+.class-item.exam .tm,.class-item.exam .pl{color:var(--paper)}
+/* study */
+.st-sec{margin:0 0 30px}
+.st-head{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--ink);padding-top:10px;margin-bottom:10px;flex-wrap:wrap}
+.st-head h3{margin:0;font-size:16px;font-weight:700}
+.st-form{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--line);margin-bottom:12px}
+.st-title{border:0;border-bottom:1.5px solid var(--ink);background:transparent;padding:7px 2px;font-size:16px;outline:none;color:var(--ink)}
+.st-row{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap}
+.st-row.end{justify-content:flex-end}
+.st-form textarea,.unit-edit textarea{border:1px solid var(--line);background:transparent;padding:8px;font-size:14px;color:var(--ink);resize:vertical;outline:none;font-family:inherit;width:100%;box-sizing:border-box}
+.st-form input.time-text,.st-form input[type="date"]{border:0;border-bottom:1px solid var(--line);background:transparent;padding:2px;font-size:14px;color:var(--ink);width:70px;outline:none}
+.st-form input.place{width:110px}
+.st-form input[type="date"]{width:auto}
+.dd-list{list-style:none;margin:0;padding:0}
+.dd{display:grid;grid-template-columns:76px 1fr auto;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.dd-n{font-family:var(--font-num);font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;letter-spacing:-.02em}
+.dd.soon .dd-n{color:var(--alert)}
+.dd.past{opacity:.55}
+.dd-title{font-size:15.5px;font-weight:600;line-height:1.4;overflow-wrap:anywhere;word-break:keep-all}
+.dd-type{display:inline-block;font-size:11.5px;font-weight:600;border:1px solid var(--ink);padding:0 6px;margin-right:6px;vertical-align:2px}
+.dd-meta{font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:2px}
+.st-past{margin-top:8px}
+.st-total{display:flex;align-items:baseline;gap:10px;margin:2px 0 14px;flex-wrap:wrap}
+.st-total .v{font-size:30px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.st-total .k{font-size:12.5px;color:var(--muted)}
+.bars{display:flex;align-items:flex-end;gap:2px;height:140px;padding-top:18px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.bar{flex:1;min-width:0;height:100%;position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;outline:none}
+.bar .bf{width:min(26px, 70%);background:var(--muted);border-radius:4px 4px 0 0;display:block;min-height:0}
+.bar.today .bf{background:var(--ink)}
+.bar:hover .bf,.bar:focus-visible .bf{background:var(--ink)}
+.bar .bl{position:absolute;bottom:-20px;font-size:11px;color:var(--muted)}
+.bar.today .bl{color:var(--ink);font-weight:700}
+.bar .bv{font-size:11px;color:var(--ink);margin-bottom:3px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.bar:hover::after,.bar:focus-visible::after{content:attr(title);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:11.5px;padding:3px 8px;white-space:nowrap;z-index:3;pointer-events:none}
+.cat-bars{list-style:none;margin:26px 0 0;padding:0;display:flex;flex-direction:column;gap:9px}
+.cat-bars li{display:grid;grid-template-columns:minmax(80px, 140px) 1fr auto;align-items:center;gap:10px;font-size:13.5px}
+.cb-name{display:flex;align-items:center;gap:7px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.cb-track{height:10px;background:color-mix(in srgb, var(--ink) 6%, transparent);display:block;border-radius:0 4px 4px 0}
+.cb-fill{display:block;height:100%;background:var(--ink);border-radius:0 4px 4px 0}
+.cb-v{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12.5px;min-width:70px;text-align:right}
+.book-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.book{border:1px solid var(--line)}
+.book.open{border-color:var(--ink)}
+.book-head{display:flex;flex-direction:column;align-items:stretch;gap:6px;width:100%;border:0;background:transparent;padding:12px 14px;text-align:left;cursor:pointer;color:var(--ink);font:inherit}
+.book-title{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;flex-wrap:wrap}
+.book-sub{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.prog{display:block;height:6px;background:color-mix(in srgb, var(--ink) 8%, transparent);border-radius:3px;overflow:hidden}
+.prog span{display:block;height:100%;background:var(--ink);border-radius:3px}
+.units{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px}
+.unit{border:1px solid var(--line);background:transparent;color:var(--ink);padding:5px 11px;border-radius:999px;font-size:13px;cursor:pointer}
+.unit.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.book .st-row{padding:0 14px 12px}
+.unit-edit{padding:0 14px 12px;display:flex;flex-direction:column;gap:8px}
+.unit-edit .st-row{padding:0}
 /* timetable editor */
 .tt-box{width:min(560px,100%);gap:14px}
 .tt-term{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);flex-wrap:wrap}
@@ -429,9 +487,10 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   nav.views .ico{display:none}
   [data-skin="mono"] nav.views .n{font-size:12px;color:inherit;opacity:.7}
   nav.views button[data-view="calendar"]{display:none}
-  body[data-section="calendar"] nav.views{display:none}
+  body[data-section="calendar"] nav.views,body[data-section="study"] nav.views{display:none}
+  nav.views button[data-view="study"]{display:none}
   /* bottom tab bar */
-  .tabbar{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:25;grid-template-columns:repeat(2,1fr);
+  .tabbar{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:25;grid-template-columns:repeat(3,1fr);
     padding:6px max(6px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
     background:color-mix(in srgb, var(--paper) 90%, transparent);-webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);border-top:1px solid var(--line)}
   .tabbar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 0 2px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:10.5px;font-weight:500;cursor:pointer}
@@ -450,6 +509,11 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   .cal-dots i{width:6px;height:6px;border-radius:50%;background:var(--cat, var(--muted))}
   .cal-dots i.due{background:transparent;box-shadow:inset 0 0 0 1.5px var(--alert)}
   .cal-dots i.done{opacity:.35}
+  .dd{grid-template-columns:62px 1fr auto;gap:8px}
+  .dd-n{font-size:18px}
+  .st-total .v{font-size:26px}
+  .cat-bars li{grid-template-columns:minmax(70px, 100px) 1fr auto}
+  .st-form input.place{width:96px}
   .week{--hh:40px;grid-template-columns:30px repeat(7,minmax(0,1fr));margin:0 -8px}
   .wk-h{font-size:10.5px;padding:4px 0}
   .wk-h b{font-size:13px}
@@ -554,6 +618,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       <button data-view="upcoming"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="lbl">예정</span><span class="n" data-count="upcoming"></span></button>
       <button data-view="someday"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 13.5 6.5 5h11l3 8.5V19a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19z"/><path d="M3.5 13.5H8l1.2 2.2h5.6l1.2-2.2h4.5"/></svg><span class="lbl">언젠가</span><span class="n" data-count="someday"></span></button>
       <button data-view="calendar"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="lbl">캘린더</span><span class="n"></span></button>
+      <button data-view="study"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg><span class="lbl">학습</span><span class="n"></span></button>
       <div class="sep"></div>
       <button data-view="done"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.3 12.2 2.6 2.6 5-5.6"/></svg><span class="lbl">완료</span><span class="n" data-count="done"></span></button>
       <button data-view="trash"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg><span class="lbl">휴지통</span><span class="n" data-count="trash"></span></button>
@@ -638,6 +703,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
 <nav class="tabbar" id="tabbar" aria-label="메뉴">
   <button type="button" data-tab="todo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.3 12.2 2.6 2.6 5-5.6"/></svg><span>할 일</span></button>
   <button type="button" data-tab="calendar"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>캘린더</span></button>
+  <button type="button" data-tab="study"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg><span>학습</span></button>
 </nav>
 
 <div class="modal" id="ttModal" hidden>
@@ -686,7 +752,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   const FIRED_KEY = "planner.fired.v1", ALARM_KEY = "planner.alarm";
   const SETTINGS_ID = "__settings";
   const WD = "일월화수목금토", WD_EN = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
-  const VIEWS = {today:"오늘", upcoming:"예정", someday:"언젠가", calendar:"캘린더", done:"완료", trash:"휴지통"};
+  const VIEWS = {today:"오늘", upcoming:"예정", someday:"언젠가", calendar:"캘린더", study:"학습", done:"완료", trash:"휴지통"};
   const TODO_VIEWS = ["today", "upcoming", "someday", "done", "trash"];
   const SORTS = {datetime:"날짜·시간순", due:"마감 임박순", created:"등록순", manual:"직접 정렬"};
   const REMIND = [["", "없음"], ["0", "정각"], ["5", "5분 전"], ["10", "10분 전"], ["30", "30분 전"], ["60", "1시간 전"], ["1440", "하루 전"]];
@@ -906,7 +972,10 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     if (ka !== kb) return ka < kb ? -1 : 1;
     return (a.createdAt || 0) - (b.createdAt || 0);
   }
-  function all(){ return [...items.entries()].map(([id, d]) => Object.assign({id}, d)); }
+  // items holds tasks plus study records (kind "exam" / "book"); task lists only see tasks
+  const isTask = (d) => !d.kind || d.kind === "task";
+  function all(){ return [...items.entries()].filter(([, d]) => isTask(d)).map(([id, d]) => Object.assign({id}, d)); }
+  function allKind(k){ return [...items.entries()].filter(([, d]) => d.kind === k).map(([id, d]) => Object.assign({id}, d)); }
   function passCat(i){
     if (filterCat == null) return true;
     if (filterCat === "none") return !catOf(i);
@@ -1054,6 +1123,8 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     let html = "";
     if (view === "calendar") {
       html = calendarHTML();
+    } else if (view === "study") {
+      html = studyHTML();
     } else if (view === "today") {
       html = todayClassesHTML() + group("지난 일", b.late, "late", true) + group("남은 일", b.today) + group("오늘 완료", b.doneToday);
       if (!html) html = empty("없음");
@@ -1083,9 +1154,10 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     fitTitles();
     const catName = filterCat === "none" ? "미분류" : (filterCat && (settings.categories.find((c) => c.id === filterCat) || {}).name);
     $("#viewTitle").textContent = VIEWS[view] + (catName ? " · " + catName : "");
-    $("#addForm").hidden = (view === "done" || view === "trash" || view === "calendar");
-    $("#listbar").hidden = (view === "done" || view === "trash" || view === "calendar");
-    document.body.dataset.section = view === "calendar" ? "calendar" : "todo";
+    const special = view === "calendar" || view === "study";
+    $("#addForm").hidden = (view === "done" || view === "trash" || special);
+    $("#listbar").hidden = (view === "done" || view === "trash" || special);
+    document.body.dataset.section = special ? view : "todo";
     $("#viewTitle").hidden = view === "calendar";
     document.querySelectorAll("#tabbar [data-tab]").forEach((t) => t.setAttribute("aria-current", String(t.dataset.tab === document.body.dataset.section)));
 
@@ -1249,14 +1321,27 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   });
   content.addEventListener("change", (e) => {
     const f = e.target.dataset.field;
-    if (!f || f === "title" || f === "note" || f === "__time") return;
+    if (f === "title") {
+      // editing a title: "18:00 수업" moves the time into the pill, like when adding
+      const id = e.target.closest("[data-id]").dataset.id;
+      const cur = items.get(id); if (!cur) return;
+      const p = parseTime(e.target.value);
+      if (p && p.title) {
+        const next = Object.assign({}, cur, {title: p.title, time: p.time});
+        if (!cur.time && cur.remind == null) next.remind = 0;
+        commit(id, next);
+        render();
+      }
+      return;
+    }
+    if (!f || f === "note" || f === "__time") return;
     const id = e.target.closest("[data-id]").dataset.id;
     const cur = items.get(id); if (!cur) return;
     const next = Object.assign({}, cur);
     const v = e.target.value;
     if (f === "done") {
       const now = Date.now();
-      if (e.target.checked && next.timerStart) { next.spent = (next.spent || 0) + now - next.timerStart; next.timerStart = null; }
+      if (e.target.checked && next.timerStart) Object.assign(next, closeRun(next, now));
       if (e.target.checked) next.timerActive = false;
       next.done = e.target.checked; next.doneAt = e.target.checked ? now : null;
     } else if (f === "categoryId") {
@@ -1392,11 +1477,17 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   }
   const runningItem = () => { const a = activeItem(); return a && a.timerStart ? a : null; };
   let sheetOpen = false;
+  // closing a run records it as a session so study time can be counted per day
+  function closeRun(d, now){
+    if (!d.timerStart) return {};
+    const sessions = (Array.isArray(d.sessions) ? d.sessions : []).concat([{s: d.timerStart, e: now}]).slice(-400);
+    return {spent: (d.spent || 0) + now - d.timerStart, timerStart: null, sessions};
+  }
   function startTimer(id, openSheet){
     const now = Date.now();
     for (const [oid, d] of items) {
       if (oid === id || !(d.timerStart || d.timerActive)) continue;
-      commit(oid, Object.assign({}, d, {spent: (d.spent || 0) + (d.timerStart ? now - d.timerStart : 0), timerStart: null, timerActive: false}));
+      commit(oid, Object.assign({}, d, closeRun(d, now), {timerStart: null, timerActive: false}));
     }
     const d = items.get(id);
     commit(id, Object.assign({}, d, {timerStart: now, timerActive: true, timerActiveAt: now}));
@@ -1406,20 +1497,21 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   }
   function pauseTimer(id){
     const d = items.get(id); if (!d || !d.timerStart) return;
-    commit(id, Object.assign({}, d, {spent: (d.spent || 0) + Date.now() - d.timerStart, timerStart: null}));
+    commit(id, Object.assign({}, d, closeRun(d, Date.now())));
     render();
   }
   function stopTimer(id){
     const d = items.get(id); if (!d) return;
-    commit(id, Object.assign({}, d, {spent: (d.spent || 0) + (d.timerStart ? Date.now() - d.timerStart : 0), timerStart: null, timerActive: false}));
+    commit(id, Object.assign({}, d, closeRun(d, Date.now()), {timerStart: null, timerActive: false}));
     sheetOpen = false;
     render();
   }
   function finishTimer(id){
     const d = items.get(id); if (!d) return;
     const now = Date.now();
-    const spent = (d.spent || 0) + (d.timerStart ? now - d.timerStart : 0);
-    commit(id, Object.assign({}, d, {spent, timerStart: null, timerActive: false, done: true, doneAt: now}));
+    const run = closeRun(d, now);
+    const spent = run.spent != null ? run.spent : (d.spent || 0);
+    commit(id, Object.assign({}, d, run, {timerStart: null, timerActive: false, done: true, doneAt: now}));
     sheetOpen = false;
     render();
     showToast("완료 · " + fmtMin(spent));
@@ -1677,6 +1769,9 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     return all().filter((i) => !i.deleted && !i.done && passCat(i) && i.due === d && i.date !== d);
   }
   const catColor = (it) => { const c = catOf(it); return c ? c.color : ""; };
+  const EXAM_TYPES = {exam: "시험", assignment: "과제", quiz: "퀴즈", presentation: "발표"};
+  function examsOn(d){ return allKind("exam").filter((x) => !x.deleted && passCat(x) && x.date === d).sort((a, b) => (a.time || "99") < (b.time || "99") ? -1 : 1); }
+  function examEvHTML(x){ return '<span class="cal-ev exam">' + esc(EXAM_TYPES[x.examType] || "시험") + " · " + esc(x.title || "") + "</span>"; }
   function evHTML(it, due){
     const col = due ? "" : catColor(it);
     return '<span class="cal-ev' + (due ? " due" : "") + (it.done ? " done" : "") + '"' + (col ? ' style="--cat:' + esc(col) + '"' : "") + ">" +
@@ -1707,9 +1802,10 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       const d = new Date(start); d.setDate(start.getDate() + k);
       const ds = ymd(d);
       const tasks = tasksOn(ds), dues = duesOn(ds);
-      const evs = tasks.map((it) => evHTML(it, false)).concat(dues.map((it) => evHTML(it, true)));
+      const exs = examsOn(ds);
+      const evs = exs.map(examEvHTML).concat(tasks.map((it) => evHTML(it, false)), dues.map((it) => evHTML(it, true)));
       const shown = evs.slice(0, 3).join("") + (evs.length > 3 ? '<span class="cal-more">+' + (evs.length - 3) + "</span>" : "");
-      const dots = tasks.slice(0, 4).map((it) => '<i' + (it.done ? ' class="done"' : "") + (catColor(it) ? ' style="--cat:' + esc(catColor(it)) + '"' : "") + "></i>").join("") + (dues.length ? '<i class="due"></i>' : "");
+      const dots = tasks.slice(0, 4).map((it) => '<i' + (it.done ? ' class="done"' : "") + (catColor(it) ? ' style="--cat:' + esc(catColor(it)) + '"' : "") + "></i>").join("") + (dues.length ? '<i class="due"></i>' : "") + (exs.length ? '<i class="exam"></i>' : "");
       const cls = ["cal-cell", d.getMonth() !== a.getMonth() ? "other" : "", ds === t ? "today" : "", ds === calSel ? "sel" : "", d.getDay() === 0 ? "sun" : ""].filter(Boolean).join(" ");
       h += '<button type="button" class="' + cls + '" data-cal="pick" data-date="' + ds + '" aria-label="' + esc(fmtDate(ds)) + (tasks.length ? ", 할 일 " + tasks.length + "개" : "") + '">' +
         '<span class="cal-num">' + d.getDate() + '</span><span class="cal-items">' + shown + '</span><span class="cal-dots">' + dots + "</span></button>";
@@ -1723,6 +1819,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       const list = [];
       for (const {c, sl} of classesOn(d)) list.push({kind: "class", s: toMin(sl.start), e: Math.max(toMin(sl.end), toMin(sl.start) + 20), c, sl});
       for (const it of tasksOn(d)) if (it.time) list.push({kind: "task", s: toMin(it.time), e: toMin(it.time) + 50, it});
+      for (const x of examsOn(d)) if (x.time) list.push({kind: "exam", s: toMin(x.time), e: toMin(x.time) + 75, x});
       return list.sort((a, b) => a.s - b.s);
     });
     let lo = 9 * 60, hi = 18 * 60;
@@ -1737,7 +1834,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     h += '<div class="wk-corner" style="font-size:10px;color:var(--muted);text-align:right;padding:3px 4px 0 0">종일</div>';
     days.forEach((d) => {
       const untimed = tasksOn(d).filter((it) => !it.time);
-      h += '<div class="wk-allday">' + untimed.slice(0, 3).map((it) => evHTML(it, false)).join("") + (untimed.length > 3 ? '<span class="cal-more">+' + (untimed.length - 3) + "</span>" : "") + "</div>";
+      h += '<div class="wk-allday">' + examsOn(d).filter((x) => !x.time).map(examEvHTML).join("") + untimed.slice(0, 3).map((it) => evHTML(it, false)).join("") + (untimed.length > 3 ? '<span class="cal-more">+' + (untimed.length - 3) + "</span>" : "") + "</div>";
     });
     h += '<div class="wk-gut" style="height:calc(var(--hh) * ' + hours + ')">';
     for (let k = 1; k < hours; k++) h += '<span style="top:calc(var(--hh) * ' + k + ')">' + pad(lo / 60 + k) + "</span>";
@@ -1752,7 +1849,9 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       for (const b of list) {
         const top = "calc(var(--hh) * " + ((b.s - lo) / 60) + ")", ht = "max(20px, calc(var(--hh) * " + ((b.e - b.s) / 60) + " - 2px))";
         const pos = "top:" + top + ";height:" + ht + ";left:calc(" + (100 * b.lane / n) + "% + 2px);right:auto;width:calc(" + (100 / n) + "% - 4px)";
-        if (b.kind === "class") {
+        if (b.kind === "exam") {
+          h += '<button type="button" class="blk exam" data-cal="pick" data-date="' + d + '" style="' + pos + '"><b>' + esc((EXAM_TYPES[b.x.examType] || "시험") + " " + (b.x.title || "")) + "</b><span>" + b.x.time + (b.x.place ? " · " + esc(b.x.place) : "") + "</span></button>";
+        } else if (b.kind === "class") {
           h += '<button type="button" class="blk" data-cal="pick" data-date="' + d + '" style="--cat:' + esc(courseColor(b.c)) + ";" + pos + '"><b>' + esc(b.c.name || "수업") + "</b><span>" + b.sl.start + "–" + b.sl.end + (b.c.place ? " · " + esc(b.c.place) : "") + "</span></button>";
         } else {
           const col = catColor(b.it);
@@ -1772,10 +1871,12 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     const dt = parse(d);
     let h = '<section class="day"><div class="day-head"><h3>' + (dt.getMonth() + 1) + "월 " + dt.getDate() + "일 (" + WD[dt.getDay()] + ')</h3><span class="tag">' + tag + "</span></div>";
     h += '<form class="cal-add" data-cal-form autocomplete="off"><input id="calAddInput" placeholder="이 날 할 일" aria-label="' + esc(fmtDate(d)) + ' 할 일 추가 (예: 18:00 운동)"><button type="submit">적기</button></form>';
+    const exs = examsOn(d);
+    if (exs.length) h += '<ul class="class-list">' + exs.map((x) => '<li class="class-item exam"><span class="tm">' + (x.time || "종일") + '</span><span class="nm">' + esc(EXAM_TYPES[x.examType] || "시험") + " · " + esc(x.title || "") + "</span>" + (x.place ? '<span class="pl">' + esc(x.place) + "</span>" : "") + "</li>").join("") + "</ul>";
     if (classes.length) h += '<ul class="class-list">' + classes.map(({c, sl}) => '<li class="class-item" style="--cat:' + esc(courseColor(c)) + '"><span class="tm">' + sl.start + "–" + sl.end + '</span><span class="nm">' + esc(c.name || "수업") + "</span>" + (c.place ? '<span class="pl">' + esc(c.place) + "</span>" : "") + "</li>").join("") + "</ul>";
     if (tasks.length) h += '<ul class="list">' + tasks.map((it) => rowHTML(it, false)).join("") + "</ul>";
     if (dues.length) h += '<section class="group late"><h3>마감 <span class="n">' + dues.length + '</span></h3><ul class="list">' + dues.map((it) => rowHTML(it, true)).join("") + "</ul></section>";
-    if (!classes.length && !tasks.length && !dues.length) h += empty("없음");
+    if (!classes.length && !tasks.length && !dues.length && !exs.length) h += empty("없음");
     return h + "</section>";
   }
   function calendarHTML(){
@@ -1890,6 +1991,210 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   $("#ttModal").addEventListener("click", (e) => { if (e.target.id === "ttModal") closeTimetable(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#ttModal").hidden) closeTimetable(); });
 
+  // ================= study =================
+  const STATS_KEY = "planner.statsRange";
+  let statsRange = lsGet(STATS_KEY, "week");
+  let examForm = null;           // null | {id?: string} while the add/edit form is open
+  let bookForm = false;
+  let openBook = null, editUnitsBook = null, showPastExams = false;
+  const dday = (d) => { const n = diffDays(d, today()); return n === 0 ? "D-DAY" : n > 0 ? "D-" + n : "D+" + (-n); };
+  const fmtHM = (ms) => { const m = Math.round(ms / 60000); if (m < 1) return "0분"; const h = Math.floor(m / 60); return (h ? h + "시간" + (m % 60 ? " " : "") : "") + (m % 60 ? (m % 60) + "분" : ""); };
+  function catTag(id){ const c = id && settings.categories.find((x) => x.id === id); return c ? '<span class="cat" style="--cat:' + esc(c.color) + '">' + esc(c.name) + "</span>" : ""; }
+  function catSelect(sel, attr){ return '<select class="sel" ' + attr + '><option value="">과목 없음</option>' + settings.categories.map((c) => '<option value="' + esc(c.id) + '"' + (c.id === sel ? " selected" : "") + ">" + esc(c.name) + "</option>").join("") + "</select>"; }
+
+  // ---- exams & assignments ----
+  function examFormHTML(x){
+    x = x || {examType: "exam", title: "", date: "", time: "", place: "", categoryId: filterCat && filterCat !== "none" ? filterCat : ""};
+    return '<form class="st-form" data-st-form="exam" autocomplete="off">' +
+      '<div class="quick" role="group" aria-label="종류">' + Object.entries(EXAM_TYPES).map(([k, l]) => '<button type="button" data-etype="' + k + '" aria-pressed="' + (x.examType === k) + '">' + l + "</button>").join("") + "</div>" +
+      '<input type="hidden" name="examType" value="' + esc(x.examType || "exam") + '">' +
+      '<input class="st-title" name="title" placeholder="이름 (예: 미시경제 중간고사)" value="' + esc(x.title) + '" required aria-label="이름">' +
+      '<div class="st-row"><label class="fld">날짜 <input type="date" name="date" value="' + esc(x.date) + '" required></label>' +
+      '<label class="fld">시간 <input type="text" class="time-text" name="time" inputmode="numeric" maxlength="5" placeholder="선택" value="' + esc(x.time || "") + '"></label>' +
+      '<label class="fld">장소 <input type="text" class="time-text place" name="place" placeholder="선택" value="' + esc(x.place || "") + '"></label>' +
+      catSelect(x.categoryId, 'name="categoryId" aria-label="과목"') + "</div>" +
+      '<div class="st-row end"><button type="button" class="mini always" data-st="cancel">취소</button><button type="submit" class="primary">' + (x.id ? "저장" : "추가") + "</button></div></form>";
+  }
+  function examsHTML(){
+    const t = today();
+    const list = allKind("exam").filter((x) => !x.deleted && passCat(x)).sort((a, b) => (a.date + (a.time || "")) < (b.date + (b.time || "")) ? -1 : 1);
+    const up = list.filter((x) => x.date >= t), past = list.filter((x) => x.date < t).reverse();
+    const card = (x) => {
+      if (examForm && examForm.id === x.id) return examFormHTML(x);
+      const n = diffDays(x.date, t);
+      const dt = parse(x.date);
+      return '<li class="dd' + (n < 0 ? " past" : n <= 3 ? " soon" : "") + '" data-exam="' + esc(x.id) + '">' +
+        '<span class="dd-n">' + dday(x.date) + "</span>" +
+        '<div class="dd-body"><div class="dd-title"><span class="dd-type">' + esc(EXAM_TYPES[x.examType] || "시험") + "</span>" + esc(x.title || "") + "</div>" +
+        '<div class="dd-meta">' + (dt.getMonth() + 1) + "월 " + dt.getDate() + "일 (" + WD[dt.getDay()] + ")" + (x.time ? " " + esc(x.time) : "") + (x.place ? " · " + esc(x.place) : "") + catTag(x.categoryId) + "</div></div>" +
+        '<div class="acts"><button type="button" class="mini always more" data-st="edit-exam" aria-label="수정">' + MORE_SVG + '<span class="lbl">수정</span></button>' +
+        '<button type="button" class="icon-btn" data-st="del-exam" aria-label="삭제"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg></button></div></li>';
+    };
+    let h = '<section class="st-sec"><div class="st-head"><h3>시험·과제</h3>' + (examForm && !examForm.id ? "" : '<button type="button" class="cal-btn" data-st="add-exam">+ 추가</button>') + "</div>";
+    if (examForm && !examForm.id) h += examFormHTML();
+    h += up.length ? '<ul class="dd-list">' + up.map(card).join("") + "</ul>" : (examForm ? "" : empty("다가오는 일정 없음"));
+    if (past.length) {
+      h += '<button type="button" class="mini always st-past" data-st="toggle-past">지난 일정 ' + past.length + (showPastExams ? " 접기" : "") + "</button>";
+      if (showPastExams) h += '<ul class="dd-list">' + past.map(card).join("") + "</ul>";
+    }
+    return h + "</section>";
+  }
+
+  // ---- study time ----
+  function rangeOf(r){
+    const t = today();
+    if (r === "today") return {from: t, to: t};
+    if (r === "week") { const a = weekStart(t); return {from: a, to: addDays(a, 6)}; }
+    const d = parse(t); const a = ymd(new Date(d.getFullYear(), d.getMonth(), 1)); const b = ymd(new Date(d.getFullYear(), d.getMonth() + 1, 0));
+    return {from: a, to: b};
+  }
+  // per-day, per-category totals from timer sessions (older totals without sessions count on the day they were finished)
+  function studyLog(){
+    const byDay = {};
+    const add = (day, cat, ms) => { if (ms <= 0) return; (byDay[day] = byDay[day] || {})[cat] = ((byDay[day] || {})[cat] || 0) + ms; };
+    const now = Date.now();
+    for (const it of all()) {
+      if (it.deleted) continue;
+      const cat = catOf(it) ? it.categoryId : "";
+      let logged = 0;
+      for (const ss of (Array.isArray(it.sessions) ? it.sessions : [])) { const ms = ss.e - ss.s; logged += ms; add(ymd(new Date(ss.s)), cat, ms); }
+      if (it.timerStart) add(ymd(new Date(it.timerStart)), cat, now - it.timerStart);
+      const legacy = (it.spent || 0) - logged;
+      if (legacy > 60000) add(ymd(new Date(it.doneAt || it.updatedAt || now)), cat, legacy);
+    }
+    return byDay;
+  }
+  function statsHTML(){
+    const log = studyLog();
+    const {from, to} = rangeOf(statsRange);
+    const days = []; for (let d = from; d <= to; d = addDays(d, 1)) days.push(d);
+    const byCat = {}; let total = 0;
+    const daily = days.map((d) => { let sum = 0; for (const [c, ms] of Object.entries(log[d] || {})) { if (filterCat && filterCat !== "none" && c !== filterCat) continue; if (filterCat === "none" && c) continue; byCat[c] = (byCat[c] || 0) + ms; sum += ms; } total += sum; return {d, ms: sum}; });
+    const seg = [["today", "오늘"], ["week", "이번 주"], ["month", "이번 달"]].map(([k, l]) => '<button type="button" data-st="range" data-range="' + k + '" aria-pressed="' + (statsRange === k) + '">' + l + "</button>").join("");
+    let h = '<section class="st-sec"><div class="st-head"><h3>공부 시간</h3><div class="seg2" role="group" aria-label="기간">' + seg + "</div></div>";
+    h += '<div class="st-total"><span class="v">' + fmtHM(total) + '</span><span class="k">' + (statsRange === "today" ? "오늘" : statsRange === "week" ? "이번 주" : "이번 달") + " 합계 · 타이머 기록 기준</span></div>";
+    if (statsRange !== "today") {
+      const max = Math.max(1, ...daily.map((x) => x.ms));
+      const t = today();
+      h += '<div class="bars" role="img" aria-label="날짜별 공부 시간">' + daily.map((x) => {
+        const dt = parse(x.d), pct = Math.round(x.ms / max * 100);
+        const lbl = statsRange === "week" ? WD[dt.getDay()] : (dt.getDate() === 1 || dt.getDate() % 5 === 0 ? String(dt.getDate()) : "");
+        const val = x.ms > 0 && (x.ms === max || x.d === t) ? '<span class="bv">' + fmtHM(x.ms).replace("시간", "h").replace("분", "m").replace(" ", "") + "</span>" : "";
+        return '<div class="bar' + (x.d === t ? " today" : "") + (x.d > t ? " future" : "") + '" title="' + esc(fmtDate(x.d) + " · " + fmtHM(x.ms)) + '" tabindex="0">' + val + '<span class="bf" style="height:' + (x.ms ? Math.max(4, pct) : 0) + '%"></span><span class="bl">' + lbl + "</span></div>";
+      }).join("") + "</div>";
+    }
+    const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+    if (cats.length) {
+      const top = cats[0][1];
+      h += '<ul class="cat-bars">' + cats.map(([c, ms]) => {
+        const k = c && settings.categories.find((x) => x.id === c);
+        return '<li><span class="cb-name"><span class="dot' + (k ? "" : " none") + '" style="--cat:' + esc(k ? k.color : "transparent") + '"></span>' + esc(k ? k.name : "미분류") + '</span><span class="cb-track"><span class="cb-fill" style="width:' + Math.max(2, Math.round(ms / top * 100)) + '%"></span></span><span class="cb-v">' + fmtHM(ms) + "</span></li>";
+      }).join("") + "</ul>";
+    } else h += empty("할 일의 ▶ 타이머로 공부하면 여기에 쌓여요");
+    return h + "</section>";
+  }
+
+  // ---- books & chapters ----
+  function bookFormHTML(){
+    return '<form class="st-form" data-st-form="book" autocomplete="off">' +
+      '<input class="st-title" name="title" placeholder="교재 이름 (예: Contemporary Linear Algebra)" required aria-label="교재 이름">' +
+      '<div class="st-row">' + catSelect(filterCat && filterCat !== "none" ? filterCat : "", 'name="categoryId" aria-label="과목"') +
+      '<label class="fld">단원 수 <input type="text" class="time-text" name="count" inputmode="numeric" maxlength="3" placeholder="12"></label></div>' +
+      '<textarea name="units" rows="3" placeholder="또는 단원 이름을 한 줄에 하나씩 (예: 1장 선형방정식)" aria-label="단원 목록"></textarea>' +
+      '<div class="st-row end"><button type="button" class="mini always" data-st="cancel-book">취소</button><button type="submit" class="primary">추가</button></div></form>';
+  }
+  function booksHTML(){
+    const list = allKind("book").filter((b) => !b.deleted && passCat(b)).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    let h = '<section class="st-sec"><div class="st-head"><h3>교재 진도</h3>' + (bookForm ? "" : '<button type="button" class="cal-btn" data-st="add-book">+ 교재</button>') + "</div>";
+    if (bookForm) h += bookFormHTML();
+    if (!list.length && !bookForm) h += empty("교재를 추가하면 단원별로 체크할 수 있어요");
+    h += '<ul class="book-list">' + list.map((b) => {
+      const units = Array.isArray(b.units) ? b.units : [];
+      const done = units.filter((u) => u.done).length, pct = units.length ? Math.round(done / units.length * 100) : 0;
+      const isOpen = openBook === b.id;
+      const next = units.find((u) => !u.done);
+      let body = "";
+      if (isOpen) {
+        body = editUnitsBook === b.id
+          ? '<div class="unit-edit"><textarea data-unit-edit rows="' + Math.min(12, Math.max(4, units.length + 1)) + '" aria-label="단원 목록">' + esc(units.map((u) => u.name).join("\n")) + '</textarea><div class="st-row end"><button type="button" class="mini always" data-st="cancel-units">취소</button><button type="button" class="primary" data-st="save-units">저장</button></div></div>'
+          : '<div class="units">' + units.map((u) => '<button type="button" class="unit' + (u.done ? " on" : "") + '" data-st="unit" data-unit="' + esc(u.id) + '" aria-pressed="' + !!u.done + '">' + esc(u.name) + "</button>").join("") + "</div>" +
+            '<div class="st-row end"><button type="button" class="mini always" data-st="edit-units">단원 편집</button><button type="button" class="mini always danger" data-st="del-book">교재 삭제</button></div>';
+      }
+      return '<li class="book' + (isOpen ? " open" : "") + '" data-book="' + esc(b.id) + '">' +
+        '<button type="button" class="book-head" data-st="open-book" aria-expanded="' + isOpen + '"><span class="book-title">' + esc(b.title || "교재") + catTag(b.categoryId) + "</span>" +
+        '<span class="book-sub">' + (units.length ? done + "/" + units.length + " · " + pct + "%" + (next && !isOpen ? " · 다음: " + esc(next.name) : "") : "단원 없음") + "</span>" +
+        '<span class="prog"><span style="width:' + pct + '%"></span></span></button>' + body + "</li>";
+    }).join("") + "</ul>";
+    return h + "</section>";
+  }
+  function studyHTML(){ return examsHTML() + statsHTML() + booksHTML(); }
+  function unitsFrom(text, count, old){
+    let names = String(text || "").split(/\n/).map((x) => x.trim()).filter(Boolean);
+    if (!names.length && count > 0) names = Array.from({length: Math.min(200, count)}, (_, i) => (i + 1) + "장");
+    const prev = new Map((old || []).map((u) => [u.name, u]));
+    return names.map((n) => prev.get(n) ? Object.assign({}, prev.get(n)) : {id: newId("u"), name: n, done: false});
+  }
+  content.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-st],[data-etype]"); if (!b) return;
+    if (b.dataset.etype) {
+      const f = b.closest("form"); f.elements.examType.value = b.dataset.etype;
+      f.querySelectorAll("[data-etype]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      return;
+    }
+    const a = b.dataset.st;
+    const examId = b.closest("[data-exam]") && b.closest("[data-exam]").dataset.exam;
+    const bookId = b.closest("[data-book]") && b.closest("[data-book]").dataset.book;
+    if (a === "add-exam") examForm = {};
+    else if (a === "cancel") examForm = null;
+    else if (a === "edit-exam") examForm = {id: examId};
+    else if (a === "del-exam") {
+      const cur = items.get(examId); commit(examId, Object.assign({}, cur, {deleted: true}));
+      showToast("삭제됨", "되돌리기", () => { const c = items.get(examId); if (c) { commit(examId, Object.assign({}, c, {deleted: false})); render(); } });
+    }
+    else if (a === "toggle-past") showPastExams = !showPastExams;
+    else if (a === "range") { statsRange = b.dataset.range; lsSet(STATS_KEY, statsRange); }
+    else if (a === "add-book") bookForm = true;
+    else if (a === "cancel-book") bookForm = false;
+    else if (a === "open-book") { openBook = openBook === bookId ? null : bookId; editUnitsBook = null; }
+    else if (a === "unit") {
+      const cur = items.get(bookId); const uid = b.dataset.unit;
+      commit(bookId, Object.assign({}, cur, {units: cur.units.map((u) => u.id === uid ? Object.assign({}, u, {done: !u.done, doneAt: u.done ? null : Date.now()}) : u)}));
+    }
+    else if (a === "edit-units") editUnitsBook = bookId;
+    else if (a === "cancel-units") editUnitsBook = null;
+    else if (a === "save-units") {
+      const cur = items.get(bookId); const ta = b.closest(".unit-edit").querySelector("textarea");
+      commit(bookId, Object.assign({}, cur, {units: unitsFrom(ta.value, 0, cur.units)}));
+      editUnitsBook = null;
+    }
+    else if (a === "del-book") {
+      const cur = items.get(bookId); commit(bookId, Object.assign({}, cur, {deleted: true})); openBook = null;
+      showToast("'" + (cur.title || "교재") + "' 삭제됨", "되돌리기", () => { const c = items.get(bookId); if (c) { commit(bookId, Object.assign({}, c, {deleted: false})); render(); } });
+    }
+    else return;
+    render();
+    if (a === "add-exam" || a === "edit-exam" || a === "add-book") { const f = content.querySelector(".st-form .st-title"); if (f) f.focus(); }
+  });
+  content.addEventListener("submit", (e) => {
+    const kind = e.target.dataset && e.target.dataset.stForm; if (!kind) return;
+    e.preventDefault();
+    const f = e.target.elements, now = Date.now();
+    if (kind === "exam") {
+      const time = f.time.value.trim() ? normTime(f.time.value) : "";
+      if (time === null) { showToast("시간 형식: 13:30"); f.time.focus(); return; }
+      if (!f.date.value) { f.date.focus(); return; }
+      const data = {kind: "exam", examType: f.examType.value || "exam", title: f.title.value.trim(), date: f.date.value, time, place: f.place.value.trim(), categoryId: f.categoryId.value, deleted: false};
+      if (examForm && examForm.id) commit(examForm.id, Object.assign({}, items.get(examForm.id), data));
+      else commit(newId("x"), Object.assign(data, {createdAt: now}));
+      examForm = null;
+    } else if (kind === "book") {
+      const units = unitsFrom(f.units.value, parseInt(f.count.value, 10) || 0, []);
+      commit(newId("b"), {kind: "book", title: f.title.value.trim(), categoryId: f.categoryId.value, units, deleted: false, createdAt: now});
+      bookForm = false;
+    }
+    render();
+  });
+
   // ================= nav, backup =================
   function go(v){
     view = v;
@@ -1901,8 +2206,9 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   let lastTodoView = TODO_VIEWS.includes(view) ? view : "today";
   $("#tabbar").addEventListener("click", (e) => {
     const b = e.target.closest("[data-tab]"); if (!b) return;
-    if (b.dataset.tab === "calendar") { if (view !== "calendar") { if (TODO_VIEWS.includes(view)) lastTodoView = view; go("calendar"); } }
-    else go(view === "calendar" ? lastTodoView : view);
+    const t = b.dataset.tab;
+    if (t === "todo") go(TODO_VIEWS.includes(view) ? view : lastTodoView);
+    else if (view !== t) { if (TODO_VIEWS.includes(view)) lastTodoView = view; go(t); }
     window.scrollTo(0, 0);
   });
   window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (VIEWS[h] && h !== view) go(h); });

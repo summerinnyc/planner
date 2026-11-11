@@ -1,6 +1,6 @@
 // Offline support: keeps the app itself on the device so it opens without internet.
 // Your data is kept separately (in the page's local storage) and synced when online.
-const VERSION = "v6";
+const VERSION = "v7";
 const SHELL = "planner-shell-" + VERSION;
 const RUNTIME = "planner-runtime-v1";
 const SHELL_FILES = [
