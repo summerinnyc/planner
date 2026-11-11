@@ -395,6 +395,12 @@ body.has-timer .toast{bottom:86px}
 .dy-tabs{display:flex;gap:4px}
 .dy-tabs button{border:0;background:transparent;padding:6px 12px;border-radius:999px;font-size:14px;color:var(--muted);cursor:pointer}
 .dy-tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper);font-weight:600}
+.dy-q-row{display:flex;justify-content:flex-end;margin-bottom:-8px}
+.dy-shuffle{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:var(--muted);font-size:12.5px;cursor:pointer;padding:2px 0}
+.dy-shuffle:hover{color:var(--ink)}
+.dy-shuffle svg{width:14px;height:14px}
+.dy-q{margin:0 0 -6px;font-size:14px;color:var(--muted);opacity:.85}
+.dy-text::placeholder{color:var(--muted);opacity:.6}
 .dy-text{width:100%;box-sizing:border-box;min-height:180px;border:1px solid var(--line);background:transparent;padding:14px;font-size:16px;line-height:1.75;color:var(--ink);resize:none;outline:none;font-family:inherit;overflow:hidden}
 .dy-text:focus{border-color:var(--ink)}
 .dy-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
@@ -2114,6 +2120,48 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     return '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="' + m.color + '"/>' + f + "</svg>";
   }
   let diarySel = today(), diaryMonth = today(), diaryTab = "ko";
+  // ---- writing prompts: one question per day, ↻ for another ----
+  const PROMPTS_KO = [
+    "오늘 가장 기억에 남는 순간은?", "오늘 나를 웃게 한 건 뭐였어?", "오늘 배운 것 하나를 적어 본다면?", "오늘 고마웠던 사람과 그 이유는?",
+    "오늘 먹은 것 중 제일 맛있었던 건?", "오늘 계획대로 된 것과 안 된 것은?", "오늘 나에게 칭찬해 주고 싶은 점은?", "내일의 나에게 한마디 한다면?",
+    "요즘 자주 듣는 노래와 그 이유는?", "오늘 공부하면서 막혔던 부분은 어디였어?", "이번 주에 꼭 하고 싶은 일 하나는?", "최근에 새로 알게 된 사실은?",
+    "오늘 하루를 세 단어로 표현하면?", "요즘 가장 많이 하는 생각은?", "오늘 아쉬웠던 순간이 있다면?", "지금 이 순간 내 기분을 날씨로 표현하면?",
+    "요즘 나를 설레게 하는 건?", "최근에 본 것 중 인상 깊었던 장면은?", "오늘 나를 힘들게 한 건 뭐였고, 어떻게 넘겼어?", "1년 뒤의 나는 어떤 모습이었으면 좋겠어?",
+    "오늘 누군가에게 하지 못한 말이 있다면?", "요즘 나만의 작은 행복은?", "오늘 시간을 가장 잘 쓴 순간은?", "다시 하루를 산다면 바꾸고 싶은 한 가지는?",
+    "요즘 응원하고 싶은 친구는 누구야?", "최근에 용기를 냈던 일은?", "지금 가장 기대되는 일정은?", "오늘 걸었던 길에서 본 풍경은?",
+    "요즘 고민 하나를 적어 보면?", "이번 학기에 이루고 싶은 것은?", "오늘 나에게 준 작은 선물은?", "최근에 읽거나 들은 좋은 문장은?",
+  ];
+  const PROMPTS_MOOD = {
+    great: ["오늘 무엇이 이렇게 좋았어?", "이 기분을 만든 순간을 자세히 남겨 둔다면?"],
+    good: ["오늘 잘 풀린 일은 뭐였어?", "좋았던 하루를 만든 작은 이유들은?"],
+    calm: ["마음이 편안했던 순간은 언제였어?", "오늘 나를 쉬게 해 준 건?"],
+    meh: ["특별할 것 없던 하루 속 작은 장면 하나는?", "오늘을 조금 더 좋게 만들려면 뭐가 필요했을까?"],
+    tired: ["오늘 무엇이 나를 지치게 했어?", "지금 나에게 필요한 휴식은 어떤 거야?"],
+    sad: ["무엇 때문에 마음이 무거웠어?", "지금의 나에게 친구처럼 말해 준다면?"],
+    anxious: ["지금 걱정되는 걸 적어 보면 조금 가벼워질까?", "내가 바꿀 수 있는 것과 없는 것은?"],
+    angry: ["무엇이 나를 화나게 했어?", "그 상황에서 내가 정말 원했던 건 뭐였을까?"],
+  };
+  const PROMPTS_EN = [
+    "What made you smile today?", "Describe your day in three sentences.", "What did you learn today?", "Who are you grateful for today, and why?",
+    "What was the best thing you ate today?", "What is one goal for tomorrow?", "Write about a place you want to visit.", "What song have you been listening to lately?",
+    "What was challenging today, and how did you handle it?", "Describe your perfect weekend.", "What are you looking forward to this week?", "Write a short letter to yourself one year from now.",
+    "What is something new you tried recently?", "Describe the weather and how it made you feel.", "What would you tell a friend who had your day?", "What is a small habit you want to build?",
+  ];
+  const promptShift = {};
+  function pickPrompt(d, en){
+    let h = 0; for (const ch of d) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    const dy = diaryOf(d);
+    const pool = en ? PROMPTS_EN : ((dy && PROMPTS_MOOD[dy.mood]) || []).concat(PROMPTS_KO);
+    const k = (en ? "en|" : "ko|") + d;
+    const mood = !en && dy && PROMPTS_MOOD[dy.mood] ? PROMPTS_MOOD[dy.mood].length : 0;
+    const base = mood && !promptShift[k] ? 0 : h;
+    return pool[(base + (promptShift[k] || 0)) % pool.length];
+  }
+  function promptHTML(dy, en){
+    const field = en ? "textEn" : "text", saved = dy && dy[en ? "promptEn" : "prompt"];
+    if (dy && (dy[field] || "").trim()) return saved ? '<p class="dy-q">' + esc(saved) + "</p>" : "";
+    return '<div class="dy-q-row"><button type="button" class="dy-shuffle" data-dy="shuffle" data-en="' + (en ? 1 : 0) + '" aria-label="다른 질문" title="다른 질문"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>다른 질문</button></div>';
+  }
   const enChecks = {};   // date -> {text, matches} from the last English check
   const diaryOf = (d) => items.get("dy-" + d) || null;
   function saveDiary(d, patch){
@@ -2142,7 +2190,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   function enPanelHTML(dy){
     const chk = enChecks[diarySel];
     const txt = (dy && dy.textEn) || "";
-    let h = '<textarea class="dy-text" data-field="diaryEn" placeholder="Write in English…" spellcheck="true" lang="en" aria-label="영어 일기">' + esc(txt) + "</textarea>";
+    let h = promptHTML(dy, true) + '<textarea class="dy-text" data-field="diaryEn" placeholder="' + esc(pickPrompt(diarySel, true)) + '" spellcheck="true" lang="en" aria-label="영어 일기">' + esc(txt) + "</textarea>";
     h += '<div class="en-bar"><button type="button" class="primary" data-dy="check"' + (txt.trim() ? "" : " disabled") + ">교정하기</button>" +
       (chk && chk.matches.length > 1 ? '<button type="button" class="mini always" data-dy="apply-all">모두 고치기</button>' : "") +
       (dy && dy.enOriginal ? '<button type="button" class="mini always" data-dy="toggle-orig">처음 쓴 글</button>' : "") +
@@ -2174,7 +2222,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     h += '<div class="moods' + (dy && dy.mood ? " picked" : "") + '" role="group" aria-label="오늘 기분">' + MOODS.map((m) => '<button type="button" class="mood" data-dy="mood" data-mood="' + m.k + '" style="--mood:' + m.color + '" aria-pressed="' + !!(dy && dy.mood === m.k) + '">' + moodSVG(m.k) + "<span>" + m.name + "</span></button>").join("") + "</div>";
     h += '<div class="dy-tabs" role="group" aria-label="일기 종류"><button type="button" data-dy="tab" data-tab-k="ko" aria-pressed="' + (diaryTab === "ko") + '">일기</button><button type="button" data-dy="tab" data-tab-k="en" aria-pressed="' + (diaryTab === "en") + '">English</button></div>';
     h += diaryTab === "ko"
-      ? '<textarea class="dy-text" data-field="diaryText" placeholder="오늘은 어땠나요?" aria-label="일기">' + esc((dy && dy.text) || "") + "</textarea>"
+      ? promptHTML(dy, false) + '<textarea class="dy-text" data-field="diaryText" placeholder="' + esc(pickPrompt(diarySel, false)) + '" aria-label="일기">' + esc((dy && dy.text) || "") + "</textarea>"
       : enPanelHTML(dy);
     h += '<div class="dy-photos">' + photos.map((p, i) => '<button type="button" data-dy="photo" data-i="' + i + '" aria-label="사진 ' + (i + 1) + ' 크게 보기"><img src="' + esc(p.url) + '" alt="" loading="lazy"></button>').join("") +
       (canUpload() ? '<label class="dy-add" id="dyAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>사진 추가</span><input type="file" id="dyFiles" accept="image/*" multiple aria-label="사진 추가"></label>' : "") + "</div>";
@@ -2186,7 +2234,12 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     const f = e.target.dataset && e.target.dataset.field;
     if (f !== "diaryText" && f !== "diaryEn") return;
     e.target.style.height = "auto"; e.target.style.height = Math.max(180, e.target.scrollHeight + 2) + "px";
-    saveDiary(diarySel, f === "diaryText" ? {text: e.target.value} : {textEn: e.target.value});
+    const before = diaryOf(diarySel);
+    const patch = f === "diaryText" ? {text: e.target.value} : {textEn: e.target.value};
+    // remember which question was showing when writing started, so it stays with the entry
+    const pk = f === "diaryText" ? "prompt" : "promptEn", fk = f === "diaryText" ? "text" : "textEn";
+    if (!(before && (before[fk] || "").trim())) patch[pk] = e.target.value.trim() ? e.target.placeholder : "";
+    saveDiary(diarySel, patch);
     if (f === "diaryEn") { const btn = content.querySelector('[data-dy="check"]'); if (btn) btn.disabled = !e.target.value.trim(); }
   });
   async function checkEnglish(){
@@ -2299,13 +2352,20 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     if (a === "pick") { diarySel = b.dataset.date; }
     else if (a === "prev-month" || a === "next-month") { const d = parse(diaryMonth); d.setDate(1); d.setMonth(d.getMonth() + (a === "prev-month" ? -1 : 1)); diaryMonth = ymd(d); }
     else if (a === "today") { diarySel = diaryMonth = today(); }
-    else if (a === "mood") { const cur = diaryOf(diarySel); saveDiary(diarySel, {mood: cur && cur.mood === b.dataset.mood ? "" : b.dataset.mood}); }
+    else if (a === "mood") { const cur = diaryOf(diarySel); delete promptShift["ko|" + diarySel]; saveDiary(diarySel, {mood: cur && cur.mood === b.dataset.mood ? "" : b.dataset.mood}); }
     else if (a === "tab") { diaryTab = b.dataset.tabK; }
     else if (a === "check") { checkEnglish(); return; }
     else if (a === "apply") { applyFix([Number(b.dataset.i)]); return; }
     else if (a === "apply-all") { const chk = enChecks[diarySel]; if (chk) applyFix(chk.matches.map((_, i) => i)); return; }
     else if (a === "jump") { const el = document.getElementById("enm-" + b.dataset.i); if (el) el.scrollIntoView({behavior: "smooth", block: "center"}); return; }
     else if (a === "toggle-orig") { enChecks.showOrig = !enChecks.showOrig; }
+    else if (a === "shuffle") {
+      const k = (b.dataset.en === "1" ? "en|" : "ko|") + diarySel;
+      promptShift[k] = (promptShift[k] || 0) + 1;
+      const ta = content.querySelector(".dy-text");
+      if (ta) { ta.placeholder = pickPrompt(diarySel, b.dataset.en === "1"); ta.focus(); }
+      return;
+    }
     else if (a === "photo") { showPhoto(Number(b.dataset.i)); return; }
     else return;
     render();
