@@ -1,11 +1,11 @@
 // Offline support: keeps the app itself on the device so it opens without internet.
 // Your data is kept separately (in the page's local storage) and synced when online.
-const VERSION = "v10";
+const VERSION = "v11";
 const SHELL = "planner-shell-" + VERSION;
 const RUNTIME = "planner-runtime-v1";
 const SHELL_FILES = [
   "./", "index.html", "config.js", "vendor/supabase.js", "manifest.webmanifest",
-  "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png", "icons/favicon-32.png"
+  "icons/s-icon-192.png", "icons/s-icon-512.png", "icons/s-apple-touch-icon.png", "icons/s-favicon-32.png"
 ];
 
 self.addEventListener("install", (e) => {
