@@ -2012,13 +2012,24 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   function catSelect(sel, attr){ return '<select class="sel" ' + attr + '><option value="">과목 없음</option>' + settings.categories.map((c) => '<option value="' + esc(c.id) + '"' + (c.id === sel ? " selected" : "") + ">" + esc(c.name) + "</option>").join("") + '<option value="__new">+ 새 과목…</option></select>'; }
   // "+ 새 과목" in a study form: keep what was typed, add the subject, then come back with it selected
   let catTarget = null, bookDraft = null;
-  content.addEventListener("change", (e) => {
-    const sel = e.target;
-    if (sel.name !== "categoryId" || sel.value !== "__new") return;
-    const f = sel.form, kind = f && f.dataset.stForm; if (!kind) return;
-    if (kind === "exam") examForm = Object.assign({}, examForm, {draft: Object.assign(examForm && examForm.id ? {id: examForm.id} : {}, {examType: f.elements.examType.value, title: f.elements.title.value, date: f.elements.date.value, time: f.elements.time.value, place: f.elements.place.value, categoryId: ""})});
-    else bookDraft = {title: f.elements.title.value, count: f.elements.count.value, units: f.elements.units.value, categoryId: ""};
-    sel.value = "";
+  function subjectPills(sel){
+    return '<div class="catpick st-pick" role="group" aria-label="과목">' +
+      '<button type="button" data-pick="" aria-pressed="' + !sel + '">과목 없음</button>' +
+      settings.categories.map((c) => '<button type="button" data-pick="' + esc(c.id) + '" style="--cat:' + esc(c.color) + '" aria-pressed="' + (sel === c.id) + '"><span class="dot"></span>' + esc(c.name || "-") + "</button>").join("") +
+      '<button type="button" class="add-cat" data-pick="__new" aria-label="새 과목" title="새 과목">+</button></div>' +
+      '<input type="hidden" name="categoryId" value="' + esc(sel || "") + '">';
+  }
+  content.addEventListener("click", (e) => {
+    const b = e.target.closest(".st-pick [data-pick]"); if (!b) return;
+    const f = b.closest("form"), kind = f.dataset.stForm;
+    if (b.dataset.pick !== "__new") {
+      f.elements.categoryId.value = b.dataset.pick;
+      f.querySelectorAll(".st-pick [data-pick]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      return;
+    }
+    // keep what was typed, add the subject, then come back with it selected
+    if (kind === "exam") examForm = Object.assign({}, examForm, {draft: Object.assign(examForm && examForm.id ? {id: examForm.id} : {}, {examType: f.elements.examType.value, title: f.elements.title.value, date: f.elements.date.value, time: f.elements.time.value, place: f.elements.place.value, categoryId: f.elements.categoryId.value})});
+    else bookDraft = {title: f.elements.title.value, count: f.elements.count.value, units: f.elements.units.value, categoryId: f.elements.categoryId.value};
     catTarget = kind;
     openCatModal();
   });
@@ -2029,11 +2040,12 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     return '<form class="st-form" data-st-form="exam" autocomplete="off">' +
       '<div class="quick" role="group" aria-label="종류">' + Object.entries(EXAM_TYPES).map(([k, l]) => '<button type="button" data-etype="' + k + '" aria-pressed="' + (x.examType === k) + '">' + l + "</button>").join("") + "</div>" +
       '<input type="hidden" name="examType" value="' + esc(x.examType || "exam") + '">' +
+      subjectPills(x.categoryId) +
       '<input class="st-title" name="title" placeholder="이름 (예: 미시경제 중간고사)" value="' + esc(x.title) + '" required aria-label="이름">' +
       '<div class="st-row"><label class="fld">날짜 <input type="date" name="date" value="' + esc(x.date) + '" required></label>' +
       '<label class="fld">시간 <input type="text" class="time-text" name="time" inputmode="numeric" maxlength="5" placeholder="선택" value="' + esc(x.time || "") + '"></label>' +
       '<label class="fld">장소 <input type="text" class="time-text place" name="place" placeholder="선택" value="' + esc(x.place || "") + '"></label>' +
-      catSelect(x.categoryId, 'name="categoryId" aria-label="과목"') + "</div>" +
+      "</div>" +
       '<div class="st-row end"><button type="button" class="mini always" data-st="cancel">취소</button><button type="submit" class="primary">' + (x.id ? "저장" : "추가") + "</button></div></form>";
   }
   function examsHTML(){
@@ -2119,8 +2131,9 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   function bookFormHTML(){
     const d = bookDraft || {title: "", count: "", units: "", categoryId: filterCat && filterCat !== "none" ? filterCat : ""};
     return '<form class="st-form" data-st-form="book" autocomplete="off">' +
+      subjectPills(d.categoryId) +
       '<input class="st-title" name="title" placeholder="교재 이름 (예: Contemporary Linear Algebra)" required aria-label="교재 이름" value="' + esc(d.title) + '">' +
-      '<div class="st-row">' + catSelect(d.categoryId, 'name="categoryId" aria-label="과목"') +
+      '<div class="st-row">' +
       '<label class="fld">단원 수 <input type="text" class="time-text" name="count" inputmode="numeric" maxlength="3" placeholder="12" value="' + esc(d.count) + '"></label></div>' +
       '<textarea name="units" rows="3" placeholder="또는 단원 이름을 한 줄에 하나씩 (예: 1장 선형방정식)" aria-label="단원 목록">' + esc(d.units) + "</textarea>" +
       '<div class="st-row end"><button type="button" class="mini always" data-st="cancel-book">취소</button><button type="submit" class="primary">추가</button></div></form>';
