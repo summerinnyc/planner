@@ -1654,7 +1654,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     renderSwatches();
     $("#newCatName").focus();
   }
-  function closeCatModal(){ $("#catModal").hidden = true; catModalFor = null; render(); }
+  function closeCatModal(){ $("#catModal").hidden = true; catModalFor = null; catTarget = null; render(); }
   function renderCatModal(){
     $("#catEdit").innerHTML = settings.categories.length
       ? settings.categories.map((c) =>
@@ -1680,6 +1680,15 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     const existing = settings.categories.find((c) => c.name === name);
     const c = existing || {id: newId("c"), name, color: $("#newCatColor").value};
     if (!existing) commitSettings({categories: settings.categories.concat([c])});
+    if (catTarget) {
+      if (catTarget === "exam" && examForm && examForm.draft) examForm.draft.categoryId = c.id;
+      if (catTarget === "book" && bookDraft) bookDraft.categoryId = c.id;
+      catTarget = null;
+      $("#newCatName").value = "";
+      closeCatModal();
+      const t = content.querySelector(".st-form .st-title"); if (t) t.focus();
+      return;
+    }
     if (catModalFor && items.get(catModalFor)) commit(catModalFor, Object.assign({}, items.get(catModalFor), {categoryId: c.id}));
     $("#newCatName").value = "";
     $("#newCatColor").value = nextColor();
@@ -2000,7 +2009,19 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   const dday = (d) => { const n = diffDays(d, today()); return n === 0 ? "D-DAY" : n > 0 ? "D-" + n : "D+" + (-n); };
   const fmtHM = (ms) => { const m = Math.round(ms / 60000); if (m < 1) return "0분"; const h = Math.floor(m / 60); return (h ? h + "시간" + (m % 60 ? " " : "") : "") + (m % 60 ? (m % 60) + "분" : ""); };
   function catTag(id){ const c = id && settings.categories.find((x) => x.id === id); return c ? '<span class="cat" style="--cat:' + esc(c.color) + '">' + esc(c.name) + "</span>" : ""; }
-  function catSelect(sel, attr){ return '<select class="sel" ' + attr + '><option value="">과목 없음</option>' + settings.categories.map((c) => '<option value="' + esc(c.id) + '"' + (c.id === sel ? " selected" : "") + ">" + esc(c.name) + "</option>").join("") + "</select>"; }
+  function catSelect(sel, attr){ return '<select class="sel" ' + attr + '><option value="">과목 없음</option>' + settings.categories.map((c) => '<option value="' + esc(c.id) + '"' + (c.id === sel ? " selected" : "") + ">" + esc(c.name) + "</option>").join("") + '<option value="__new">+ 새 과목…</option></select>'; }
+  // "+ 새 과목" in a study form: keep what was typed, add the subject, then come back with it selected
+  let catTarget = null, bookDraft = null;
+  content.addEventListener("change", (e) => {
+    const sel = e.target;
+    if (sel.name !== "categoryId" || sel.value !== "__new") return;
+    const f = sel.form, kind = f && f.dataset.stForm; if (!kind) return;
+    if (kind === "exam") examForm = Object.assign({}, examForm, {draft: Object.assign(examForm && examForm.id ? {id: examForm.id} : {}, {examType: f.elements.examType.value, title: f.elements.title.value, date: f.elements.date.value, time: f.elements.time.value, place: f.elements.place.value, categoryId: ""})});
+    else bookDraft = {title: f.elements.title.value, count: f.elements.count.value, units: f.elements.units.value, categoryId: ""};
+    sel.value = "";
+    catTarget = kind;
+    openCatModal();
+  });
 
   // ---- exams & assignments ----
   function examFormHTML(x){
@@ -2020,7 +2041,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     const list = allKind("exam").filter((x) => !x.deleted && passCat(x)).sort((a, b) => (a.date + (a.time || "")) < (b.date + (b.time || "")) ? -1 : 1);
     const up = list.filter((x) => x.date >= t), past = list.filter((x) => x.date < t).reverse();
     const card = (x) => {
-      if (examForm && examForm.id === x.id) return examFormHTML(x);
+      if (examForm && examForm.id === x.id) return examFormHTML(examForm.draft || x);
       const n = diffDays(x.date, t);
       const dt = parse(x.date);
       return '<li class="dd' + (n < 0 ? " past" : n <= 3 ? " soon" : "") + '" data-exam="' + esc(x.id) + '">' +
@@ -2031,7 +2052,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
         '<button type="button" class="icon-btn" data-st="del-exam" aria-label="삭제"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg></button></div></li>';
     };
     let h = '<section class="st-sec"><div class="st-head"><h3>시험·과제</h3>' + (examForm && !examForm.id ? "" : '<button type="button" class="cal-btn" data-st="add-exam">+ 추가</button>') + "</div>";
-    if (examForm && !examForm.id) h += examFormHTML();
+    if (examForm && !examForm.id) h += examFormHTML(examForm.draft);
     h += up.length ? '<ul class="dd-list">' + up.map(card).join("") + "</ul>" : (examForm ? "" : empty("다가오는 일정 없음"));
     if (past.length) {
       h += '<button type="button" class="mini always st-past" data-st="toggle-past">지난 일정 ' + past.length + (showPastExams ? " 접기" : "") + "</button>";
@@ -2096,11 +2117,12 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
 
   // ---- books & chapters ----
   function bookFormHTML(){
+    const d = bookDraft || {title: "", count: "", units: "", categoryId: filterCat && filterCat !== "none" ? filterCat : ""};
     return '<form class="st-form" data-st-form="book" autocomplete="off">' +
-      '<input class="st-title" name="title" placeholder="교재 이름 (예: Contemporary Linear Algebra)" required aria-label="교재 이름">' +
-      '<div class="st-row">' + catSelect(filterCat && filterCat !== "none" ? filterCat : "", 'name="categoryId" aria-label="과목"') +
-      '<label class="fld">단원 수 <input type="text" class="time-text" name="count" inputmode="numeric" maxlength="3" placeholder="12"></label></div>' +
-      '<textarea name="units" rows="3" placeholder="또는 단원 이름을 한 줄에 하나씩 (예: 1장 선형방정식)" aria-label="단원 목록"></textarea>' +
+      '<input class="st-title" name="title" placeholder="교재 이름 (예: Contemporary Linear Algebra)" required aria-label="교재 이름" value="' + esc(d.title) + '">' +
+      '<div class="st-row">' + catSelect(d.categoryId, 'name="categoryId" aria-label="과목"') +
+      '<label class="fld">단원 수 <input type="text" class="time-text" name="count" inputmode="numeric" maxlength="3" placeholder="12" value="' + esc(d.count) + '"></label></div>' +
+      '<textarea name="units" rows="3" placeholder="또는 단원 이름을 한 줄에 하나씩 (예: 1장 선형방정식)" aria-label="단원 목록">' + esc(d.units) + "</textarea>" +
       '<div class="st-row end"><button type="button" class="mini always" data-st="cancel-book">취소</button><button type="submit" class="primary">추가</button></div></form>';
   }
   function booksHTML(){
@@ -2154,7 +2176,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     else if (a === "toggle-past") showPastExams = !showPastExams;
     else if (a === "range") { statsRange = b.dataset.range; lsSet(STATS_KEY, statsRange); }
     else if (a === "add-book") bookForm = true;
-    else if (a === "cancel-book") bookForm = false;
+    else if (a === "cancel-book") { bookForm = false; bookDraft = null; }
     else if (a === "open-book") { openBook = openBook === bookId ? null : bookId; editUnitsBook = null; }
     else if (a === "unit") {
       const cur = items.get(bookId); const uid = b.dataset.unit;
@@ -2183,14 +2205,15 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       const time = f.time.value.trim() ? normTime(f.time.value) : "";
       if (time === null) { showToast("시간 형식: 13:30"); f.time.focus(); return; }
       if (!f.date.value) { f.date.focus(); return; }
-      const data = {kind: "exam", examType: f.examType.value || "exam", title: f.title.value.trim(), date: f.date.value, time, place: f.place.value.trim(), categoryId: f.categoryId.value, deleted: false};
+      const data = {kind: "exam", examType: f.examType.value || "exam", title: f.title.value.trim(), date: f.date.value, time, place: f.place.value.trim(), categoryId: f.categoryId.value === "__new" ? "" : f.categoryId.value, deleted: false};
       if (examForm && examForm.id) commit(examForm.id, Object.assign({}, items.get(examForm.id), data));
       else commit(newId("x"), Object.assign(data, {createdAt: now}));
       examForm = null;
     } else if (kind === "book") {
       const units = unitsFrom(f.units.value, parseInt(f.count.value, 10) || 0, []);
-      commit(newId("b"), {kind: "book", title: f.title.value.trim(), categoryId: f.categoryId.value, units, deleted: false, createdAt: now});
+      commit(newId("b"), {kind: "book", title: f.title.value.trim(), categoryId: f.categoryId.value === "__new" ? "" : f.categoryId.value, units, deleted: false, createdAt: now});
       bookForm = false;
+      bookDraft = null;
     }
     render();
   });
