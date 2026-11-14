@@ -247,6 +247,7 @@ body.has-timer .toast{bottom:86px}
 .ts-stop:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 /* ---------- calendar ---------- */
 .tabbar{display:none}
+body[data-section="timer"] .cats,body[data-section="diary"] .cats{display:none!important}
 .cal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:2px 0 12px}
 .cal-nav{display:flex;align-items:center;gap:4px}
 .cal-title{font-size:18px;font-weight:700;margin:0 6px;font-variant-numeric:tabular-nums;min-width:120px;text-align:center}
@@ -436,6 +437,48 @@ body.has-timer .toast{bottom:86px}
 .pv-bar{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:16px;padding:14px 14px calc(14px + env(safe-area-inset-bottom));color:#fff;font-size:14px}
 .pv-bar button{border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;border-radius:999px;padding:6px 14px;font-size:14px;cursor:pointer;min-width:40px}
 #pvDel{border-color:#ff8a80;color:#ff8a80}
+/* study timer */
+.tp{display:flex;flex-direction:column;gap:26px}
+.tp-hero{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 0 4px}
+.tp-stk{width:150px;height:150px;display:flex;align-items:center;justify-content:center}
+.tp-stk svg,.tp-stk img{width:100%;height:100%;object-fit:contain}
+.tp-stage{font-size:13px;font-weight:700;padding:2px 10px;border-radius:999px;background:color-mix(in srgb, var(--ink) 7%, transparent)}
+.tp-total{font-family:var(--font-num);font-variant-numeric:tabular-nums;font-size:54px;font-weight:700;letter-spacing:-.03em;line-height:1.05}
+.tp-sub{font-size:13px;color:var(--muted)}
+.tp-break{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tp-subjects{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.tp-subj{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:12px;padding:10px 10px 10px 14px;border:1px solid var(--line);cursor:pointer}
+.tp-subj:hover{border-color:var(--ink)}
+.tp-subj .dot{width:12px;height:12px}
+.tp-subj .nm{font-size:15.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tp-subj .tm{font-family:var(--font-num);font-variant-numeric:tabular-nums;font-size:16px;color:var(--muted)}
+.tp-subj .pl{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--ink);background:transparent;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.tp-subj .pl svg{width:16px;height:16px;display:block}
+.tp-subj.on{background:color-mix(in srgb, var(--cat, var(--line)) 40%, transparent);border-color:var(--ink)}
+.tp-subj.on .tm{color:var(--ink);font-weight:700}
+.tp-subj.on .pl{background:var(--ink);color:var(--paper)}
+.tp-add{border:1px dashed var(--muted);background:transparent;color:var(--muted);padding:10px;font-size:14px;cursor:pointer}
+.tp-add:hover{border-color:var(--ink);color:var(--ink)}
+.stk-month{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px 4px}
+.stk-month .wd{font-size:11px;color:var(--muted);text-align:center}
+.stk-day{display:flex;flex-direction:column;align-items:center;gap:1px;min-height:64px;padding:3px 0;border-radius:10px}
+.stk-day .n{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stk-day .s{width:38px;height:38px;display:flex;align-items:center;justify-content:center}
+.stk-day .s svg,.stk-day .s img{width:100%;height:100%;object-fit:contain}
+.stk-day .h{font-size:10.5px;font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+.stk-day.today{background:color-mix(in srgb, var(--ink) 5%, transparent)}
+.stk-day.today .n{color:var(--ink);font-weight:700}
+.stk-day.empty .s{opacity:0}
+.stk-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.stk-row{display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid var(--line)}
+.stk-row .pv{width:56px;height:56px}
+.stk-row .pv svg,.stk-row .pv img{width:100%;height:100%;object-fit:contain}
+.stk-row .info{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+.stk-row .info b{color:var(--ink);font-size:14.5px}
+.stk-row .info input{width:52px;border:0;border-bottom:1px solid var(--line);background:transparent;font-size:14px;color:var(--ink);text-align:center;padding:1px 2px;font-variant-numeric:tabular-nums}
+.stk-row .btns{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.stk-row label{position:relative;font-size:12.5px;border:1px solid var(--ink);padding:3px 10px;cursor:pointer;color:var(--ink)}
+.stk-row label input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:16px}
 /* timetable editor */
 .tt-box{width:min(560px,100%);gap:14px}
 .tt-term{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);flex-wrap:wrap}
@@ -552,11 +595,12 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   nav.views .ico{display:none}
   [data-skin="mono"] nav.views .n{font-size:12px;color:inherit;opacity:.7}
   nav.views button[data-view="calendar"]{display:none}
-  body[data-section="calendar"] nav.views,body[data-section="study"] nav.views,body[data-section="diary"] nav.views{display:none}
+  body[data-section="calendar"] nav.views,body[data-section="study"] nav.views,body[data-section="diary"] nav.views,body[data-section="timer"] nav.views{display:none}
+  nav.views button[data-view="timer"]{display:none}
   nav.views button[data-view="diary"]{display:none}
   nav.views button[data-view="study"]{display:none}
   /* bottom tab bar */
-  .tabbar{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:25;grid-template-columns:repeat(4,1fr);
+  .tabbar{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:25;grid-template-columns:repeat(5,1fr);
     padding:6px max(6px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
     background:color-mix(in srgb, var(--paper) 90%, transparent);-webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);border-top:1px solid var(--line)}
   .tabbar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 0 2px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:10.5px;font-weight:500;cursor:pointer}
@@ -575,6 +619,10 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   .cal-dots i{width:6px;height:6px;border-radius:50%;background:var(--cat, var(--muted))}
   .cal-dots i.due{background:transparent;box-shadow:inset 0 0 0 1.5px var(--alert)}
   .cal-dots i.done{opacity:.35}
+  .tp-total{font-size:50px}
+  .tp-stk{width:140px;height:140px}
+  .stk-day{min-height:58px}
+  .stk-day .s{width:32px;height:32px}
   .moods{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 4px}
   .mood svg{width:44px;height:44px}
   .mc .c{width:34px;height:34px}
@@ -689,6 +737,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       <button data-view="someday"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 13.5 6.5 5h11l3 8.5V19a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19z"/><path d="M3.5 13.5H8l1.2 2.2h5.6l1.2-2.2h4.5"/></svg><span class="lbl">언젠가</span><span class="n" data-count="someday"></span></button>
       <button data-view="calendar"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="lbl">캘린더</span><span class="n"></span></button>
       <button data-view="diary"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h10.5A1.5 1.5 0 0 1 18 5v15.5H7A2 2 0 0 1 5 18.5v-13a2 2 0 0 1 1-2z"/><path d="M5 18.5A2 2 0 0 1 7 16.5h11"/><path d="M9 8h5.5M9 11.5h4"/></svg><span class="lbl">일기</span><span class="n"></span></button>
+      <button data-view="timer"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M12 2.5V5"/></svg><span class="lbl">타이머</span><span class="n"></span></button>
       <button data-view="study"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg><span class="lbl">학습</span><span class="n"></span></button>
       <div class="sep"></div>
       <button data-view="done"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.3 12.2 2.6 2.6 5-5.6"/></svg><span class="lbl">완료</span><span class="n" data-count="done"></span></button>
@@ -775,6 +824,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   <button type="button" data-tab="todo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.3 12.2 2.6 2.6 5-5.6"/></svg><span>할 일</span></button>
   <button type="button" data-tab="calendar"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>캘린더</span></button>
   <button type="button" data-tab="diary"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h10.5A1.5 1.5 0 0 1 18 5v15.5H7A2 2 0 0 1 5 18.5v-13a2 2 0 0 1 1-2z"/><path d="M5 18.5A2 2 0 0 1 7 16.5h11"/><path d="M9 8h5.5M9 11.5h4"/></svg><span>일기</span></button>
+  <button type="button" data-tab="timer"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M12 2.5V5"/></svg><span>타이머</span></button>
   <button type="button" data-tab="study"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg><span>학습</span></button>
 </nav>
 
@@ -813,6 +863,14 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   </form>
 </div>
 
+<div class="modal" id="stkModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="stkTitle">
+    <h3 id="stkTitle">스티커</h3>
+    <ul class="stk-list" id="stkList"></ul>
+    <div class="modal-foot"><span>PNG는 배경이 투명하면 가장 예뻐요</span><button type="button" class="mini always" id="stkClose">닫기</button></div>
+  </div>
+</div>
+
 <div class="pview" id="pview" hidden>
   <img id="pviewImg" alt="">
   <div class="pv-bar">
@@ -835,7 +893,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   const FIRED_KEY = "planner.fired.v1", ALARM_KEY = "planner.alarm";
   const SETTINGS_ID = "__settings";
   const WD = "일월화수목금토", WD_EN = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
-  const VIEWS = {today:"오늘", upcoming:"예정", someday:"언젠가", calendar:"캘린더", study:"학습", diary:"일기", done:"완료", trash:"휴지통"};
+  const VIEWS = {today:"오늘", upcoming:"예정", someday:"언젠가", calendar:"캘린더", study:"학습", diary:"일기", timer:"타이머", done:"완료", trash:"휴지통"};
   const TODO_VIEWS = ["today", "upcoming", "someday", "done", "trash"];
   const SORTS = {datetime:"날짜·시간순", due:"마감 임박순", created:"등록순", manual:"직접 정렬"};
   const REMIND = [["", "없음"], ["0", "정각"], ["5", "5분 전"], ["10", "10분 전"], ["30", "30분 전"], ["60", "1시간 전"], ["1440", "하루 전"]];
@@ -918,6 +976,10 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       coverPath: typeof s.coverPath === "string" ? s.coverPath : "",
       coverUrl: typeof s.coverUrl === "string" ? s.coverUrl : "",
       coverY: typeof s.coverY === "number" ? Math.max(0, Math.min(100, s.coverY)) : 50,
+      focus: s.focus && typeof s.focus.start === "number" ? {categoryId: String(s.focus.categoryId || ""), start: s.focus.start} : null,
+      lastStop: typeof s.lastStop === "number" ? s.lastStop : 0,
+      stages: Array.isArray(s.stages) && s.stages.length === 6 && s.stages.every((x, i, a) => typeof x === "number" && x >= 0 && (i === 0 || x > a[i - 1])) ? s.stages.map(Number) : [0, 30, 60, 120, 180, 300],
+      stickers: Array.isArray(s.stickers) ? s.stickers.slice(0, 6).map((x) => x && typeof x.url === "string" ? {path: String(x.path || ""), url: x.url} : null) : [],
       classes: Array.isArray(s.classes) ? s.classes.filter((c) => c && c.id).map((c) => ({
         id: String(c.id), name: String(c.name || ""), place: String(c.place || ""), categoryId: String(c.categoryId || ""),
         slots: Array.isArray(c.slots) ? c.slots.filter((x) => x && x.day >= 0 && x.day <= 6).map((x) => ({day: Number(x.day), start: /^\d\d:\d\d$/.test(x.start) ? x.start : "09:00", end: /^\d\d:\d\d$/.test(x.end) ? x.end : "10:15"})) : [],
@@ -1206,6 +1268,8 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     let html = "";
     if (view === "calendar") {
       html = calendarHTML();
+    } else if (view === "timer") {
+      html = timerPageHTML();
     } else if (view === "diary") {
       html = diaryHTML();
     } else if (view === "study") {
@@ -1240,7 +1304,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     if (view === "diary") fitDiary();
     const catName = filterCat === "none" ? "미분류" : (filterCat && (settings.categories.find((c) => c.id === filterCat) || {}).name);
     $("#viewTitle").textContent = VIEWS[view] + (catName ? " · " + catName : "");
-    const special = view === "calendar" || view === "study" || view === "diary";
+    const special = view === "calendar" || view === "study" || view === "diary" || view === "timer";
     $("#addForm").hidden = (view === "done" || view === "trash" || special);
     $("#listbar").hidden = (view === "done" || view === "trash" || special);
     document.body.dataset.section = special ? view : "todo";
@@ -1571,6 +1635,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   }
   function startTimer(id, openSheet){
     const now = Date.now();
+    if (settings.focus) stopFocus(now);
     for (const [oid, d] of items) {
       if (oid === id || !(d.timerStart || d.timerActive)) continue;
       commit(oid, Object.assign({}, d, closeRun(d, now), {timerStart: null, timerActive: false}));
@@ -1606,8 +1671,22 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   function updateTimerBar(){
     const a = activeItem();
     const mini = $("#tmini"), sheet = $("#tsheet");
-    document.body.classList.toggle("has-timer", !!a);
-    if (!a) { mini.hidden = true; sheet.hidden = true; sheetOpen = false; return; }
+    updateFocusLive();
+    if (!a) {
+      sheet.hidden = true; sheetOpen = false;
+      const f = settings.focus, show = !!f && view !== "timer";
+      document.body.classList.toggle("has-timer", show);
+      mini.hidden = !show;
+      if (show) {
+        mini.classList.remove("paused");
+        $("#tmTitle").textContent = subjectName(f.categoryId) + " 공부 중";
+        $("#tmTime").textContent = fmtDur(subjectTodayMs(f.categoryId));
+        const tg = $("#tmToggle");
+        if (tg.dataset.state !== "pause") { tg.dataset.state = "pause"; tg.innerHTML = PAUSE_SVG.replace('class="ico"', ""); tg.setAttribute("aria-label", "멈추기"); }
+      }
+      return;
+    }
+    document.body.classList.toggle("has-timer", true);
     const running = !!a.timerStart;
     const el = elapsed(a);
     const goal = a.timerGoal ? a.timerGoal * 60000 : 0;
@@ -1641,6 +1720,11 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   const curTimerId = () => { const a = activeItem(); return a ? a.id : null; };
   function toggleTimer(){ const a = activeItem(); if (!a) return; a.timerStart ? pauseTimer(a.id) : startTimer(a.id); }
   $("#tmini").addEventListener("click", (e) => {
+    if (!activeItem() && settings.focus) {
+      if (e.target.closest("#tmToggle")) { e.stopPropagation(); stopFocus(); render(); }
+      else { go("timer"); window.scrollTo(0, 0); }
+      return;
+    }
     if (e.target.closest("#tmToggle")) { e.stopPropagation(); toggleTimer(); return; }
     sheetOpen = true; updateTimerBar();
   });
@@ -2092,6 +2176,175 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   $("#ttModal").addEventListener("click", (e) => { if (e.target.id === "ttModal") closeTimetable(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#ttModal").hidden) closeTimetable(); });
 
+  // ================= study timer =================
+  const STAGE_NAMES = ["씨앗", "새싹", "떡잎", "꽃봉오리", "꽃", "만개"];
+  // the default character: a little pot that grows as the day's study time adds up
+  function plantSVG(stage){
+    const eye = stage >= 5
+      ? '<path d="M47 94q3.5-3.5 7 0M66 94q3.5-3.5 7 0" fill="none" stroke="#3a2a2a" stroke-width="2.4" stroke-linecap="round"/>'
+      : '<circle cx="51" cy="94" r="2.7" fill="#3a2a2a"/><circle cx="69" cy="94" r="2.7" fill="#3a2a2a"/>';
+    const mouth = stage >= 4 ? '<path d="M55 99q5 5 10 0" fill="#3a2a2a"/>' : '<path d="M56 99q4 3.5 8 0" fill="none" stroke="#3a2a2a" stroke-width="2.2" stroke-linecap="round"/>';
+    const pot = '<path d="M36 80h48l-6 30H42z" fill="#f5c2cc"/><rect x="31" y="73" width="58" height="11" rx="5" fill="#f2a9b5"/>' + eye + mouth +
+      '<ellipse cx="45" cy="100" rx="4" ry="2.3" fill="#f0848f" opacity=".55"/><ellipse cx="75" cy="100" rx="4" ry="2.3" fill="#f0848f" opacity=".55"/>';
+    const stem = (top) => '<path d="M60 74V' + top + '" stroke="#4f9a6a" stroke-width="3.6" stroke-linecap="round"/>';
+    const leaf = (y, s, dir) => '<path d="M60 ' + y + 'q' + (-14 * s * dir) + ' -2 ' + (-17 * s * dir) + ' ' + (-13 * s) + 'q' + (14 * s * dir) + ' 0 ' + (17 * s * dir) + ' ' + (13 * s) + 'z" fill="#8fd3a8" stroke="#4f9a6a" stroke-width="1.4" stroke-linejoin="round"/>';
+    const petals = (cx, cy, r, d, col) => [0, 72, 144, 216, 288].map((a) => '<circle cx="' + (cx + d * Math.sin(a * Math.PI / 180)).toFixed(1) + '" cy="' + (cy - d * Math.cos(a * Math.PI / 180)).toFixed(1) + '" r="' + r + '" fill="' + col + '"/>').join("");
+    const spark = (x, y, k) => '<path d="M' + x + " " + (y - 5 * k) + "Q" + x + " " + y + " " + (x + 5 * k) + " " + y + "Q" + x + " " + y + " " + x + " " + (y + 5 * k) + "Q" + x + " " + y + " " + (x - 5 * k) + " " + y + "Q" + x + " " + y + " " + x + " " + (y - 5 * k) + 'z" fill="#f7c948"/>';
+    let p = "";
+    if (stage === 0) p = '<ellipse cx="60" cy="71" rx="6.5" ry="4.8" fill="#a5784f"/><path d="M57 69q2-2 5-1" stroke="#c99c72" stroke-width="1.4" fill="none" stroke-linecap="round"/>';
+    else if (stage === 1) p = stem(62) + leaf(64, 0.6, 1) + leaf(64, 0.6, -1);
+    else if (stage === 2) p = stem(50) + leaf(56, 1, 1) + leaf(52, 1, -1);
+    else if (stage === 3) p = stem(40) + leaf(62, 0.9, 1) + leaf(52, 1, -1) + '<ellipse cx="60" cy="33" rx="7.5" ry="10" fill="#f5b8c4"/><path d="M53 38q7 6 14 0q-3 6-7 6t-7-6z" fill="#6cbf8f"/>';
+    else if (stage === 4) p = stem(38) + leaf(62, 0.9, 1) + leaf(52, 1, -1) + petals(60, 32, 7.5, 9, "#f7c948") + '<circle cx="60" cy="32" r="6" fill="#f08a5a"/>';
+    else p = stem(36) + leaf(64, 1, 1) + leaf(54, 1.1, -1) + leaf(46, 0.7, 1) + petals(60, 28, 9.5, 11.5, "#f5b8c4") + '<circle cx="60" cy="28" r="7" fill="#f7c948"/>' + spark(30, 30, 1.2) + spark(92, 22, 1) + spark(88, 52, 0.8) + spark(26, 58, 0.7);
+    return '<svg viewBox="0 0 120 120" aria-hidden="true">' + p + pot + "</svg>";
+  }
+  const stageOf = (ms) => { const m = ms / 60000; let k = 0; settings.stages.forEach((t, i) => { if (m >= t) k = i; }); return k; };
+  function stickerHTML(stage){
+    const c = settings.stickers[stage];
+    return c && c.url ? '<img src="' + esc(c.url) + '" alt="' + STAGE_NAMES[stage] + '">' : plantSVG(stage);
+  }
+  const subjectName = (c) => { const k = c && settings.categories.find((x) => x.id === c); return k ? k.name : "기타"; };
+  function todayLog(){ return studyLog()[today()] || {}; }
+  function subjectTodayMs(c){ const k = c && settings.categories.some((x) => x.id === c) ? c : ""; return todayLog()[k] || 0; }
+  function startFocus(c){
+    const now = Date.now();
+    for (const [oid, d] of items) if (d.timerStart || d.timerActive) commit(oid, Object.assign({}, d, closeRun(d, now), {timerStart: null, timerActive: false}));
+    if (settings.focus) recordFocus(settings.focus, now);
+    commitSettings({focus: {categoryId: c || "", start: now}});
+    unlockAudio();
+  }
+  function recordFocus(f, end){
+    if (end - f.start < 5000) return;
+    const day = ymd(new Date(f.start)), id = "sd-" + day;
+    const cur = items.get(id) || {kind: "studyday", date: day, sessions: [], createdAt: Date.now()};
+    commit(id, Object.assign({}, cur, {sessions: (cur.sessions || []).concat([{c: f.categoryId || "", s: f.start, e: end}]), deleted: false}));
+  }
+  function stopFocus(at){
+    const f = settings.focus; if (!f) return;
+    const now = at || Date.now();
+    recordFocus(f, now);
+    commitSettings({focus: null, lastStop: now});
+  }
+  let tpMonth = today(), lastStageShown = -1;
+  function timerPageHTML(){
+    const log = studyLog(), t = today(), tl = log[t] || {};
+    const total = Object.values(tl).reduce((a, b) => a + b, 0);
+    const stage = stageOf(total); lastStageShown = stage;
+    const next = settings.stages[stage + 1];
+    const f = settings.focus;
+    const sub = next != null ? STAGE_NAMES[stage + 1] + "까지 " + fmtHM(next * 60000 - total) : "오늘 최고 단계!";
+    let h = '<div class="tp"><div class="tp-hero"><div class="tp-stk" id="tpStk">' + stickerHTML(stage) + '</div><span class="tp-stage" id="tpStage">' + STAGE_NAMES[stage] + '</span>' +
+      '<div class="tp-total" id="tpTotal">' + fmtDur(total) + '</div><div class="tp-sub" id="tpSub">' + esc(sub) + "</div>" +
+      '<div class="tp-break" id="tpBreak"></div></div>';
+    const rows = settings.categories.map((c) => ({id: c.id, name: c.name, color: c.color})).concat([{id: "", name: "기타", color: ""}]);
+    h += '<ul class="tp-subjects">' + rows.map((r) => {
+      const on = f && (f.categoryId || "") === r.id;
+      return '<li class="tp-subj' + (on ? " on" : "") + '" data-tp="toggle" data-cat="' + esc(r.id) + '"' + (r.color ? ' style="--cat:' + esc(r.color) + '"' : "") + '>' +
+        '<span class="dot' + (r.color ? "" : " none") + '" style="--cat:' + esc(r.color || "transparent") + '"></span><span class="nm">' + esc(r.name) + '</span><span class="tm" data-live-cat="' + esc(r.id) + '">' + fmtDur(tl[r.id] || 0) + "</span>" +
+        '<button type="button" class="pl" aria-label="' + esc(r.name) + (on ? " 멈추기" : " 시작") + '">' + (on ? PAUSE_SVG : PLAY_SVG).replace('class="ico"', "") + "</button></li>";
+    }).join("") + "</ul>";
+    h += '<button type="button" class="tp-add" data-tp="add-subject">+ 과목 추가</button>';
+    // sticker calendar
+    const a = parse(tpMonth), first = new Date(a.getFullYear(), a.getMonth(), 1), last = new Date(a.getFullYear(), a.getMonth() + 1, 0);
+    let monthTotal = 0;
+    let cal = '<div class="stk-month">' + WD.split("").map((w) => '<span class="wd">' + w + "</span>").join("");
+    for (let i = 0; i < first.getDay(); i++) cal += "<span></span>";
+    for (let n = 1; n <= last.getDate(); n++) {
+      const ds = ymd(new Date(a.getFullYear(), a.getMonth(), n));
+      const ms = Object.values(log[ds] || {}).reduce((x, y) => x + y, 0); monthTotal += ms;
+      const short = ms >= 60000 ? (Math.floor(ms / 3600000) ? Math.floor(ms / 3600000) + "h" : "") + (Math.round(ms % 3600000 / 60000) ? Math.round(ms % 3600000 / 60000) + "m" : "") : "";
+      cal += '<div class="stk-day' + (ds === t ? " today" : "") + (ms < 60000 ? " empty" : "") + '" title="' + esc(fmtDate(ds) + " · " + fmtHM(ms)) + '"><span class="n">' + n + '</span><span class="s">' + (ms >= 60000 ? stickerHTML(stageOf(ms)) : "") + '</span><span class="h">' + short + "</span></div>";
+    }
+    cal += "</div>";
+    h += '<section class="st-sec"><div class="st-head"><div class="cal-nav"><button type="button" class="cal-btn icon" data-tp="prev" aria-label="이전 달"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>' +
+      '<h3 style="margin:0 6px">' + (a.getMonth() + 1) + "월 스티커 · " + fmtHM(monthTotal) + "</h3>" +
+      '<button type="button" class="cal-btn icon" data-tp="next" aria-label="다음 달"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></div>' +
+      '<button type="button" class="cal-btn" data-tp="stickers">스티커 바꾸기</button></div>' + cal + "</section>";
+    return h + "</div>";
+  }
+  // refresh the running numbers once a second without rebuilding the page
+  function updateFocusLive(){
+    if (view !== "timer") return;
+    const tot = $("#tpTotal"); if (!tot) return;
+    const tl = todayLog(), total = Object.values(tl).reduce((a, b) => a + b, 0);
+    if (stageOf(total) !== lastStageShown) { render(); return; }
+    tot.textContent = fmtDur(total);
+    const next = settings.stages[lastStageShown + 1];
+    $("#tpSub").textContent = next != null ? STAGE_NAMES[lastStageShown + 1] + "까지 " + fmtHM(next * 60000 - total) : "오늘 최고 단계!";
+    content.querySelectorAll("[data-live-cat]").forEach((el) => { el.textContent = fmtDur(tl[el.dataset.liveCat] || 0); });
+    const br = $("#tpBreak");
+    const busy = settings.focus || activeItem();
+    br.textContent = !busy && settings.lastStop && ymd(new Date(settings.lastStop)) === today() ? "쉬는 중 · " + fmtDur(Date.now() - settings.lastStop) : (activeItem() ? "할 일 타이머 진행 중 · " + (activeItem().title || "") : "");
+  }
+  content.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-tp]"); if (!b) return;
+    const a = b.dataset.tp;
+    if (a === "toggle") {
+      const c = b.dataset.cat;
+      if (settings.focus && (settings.focus.categoryId || "") === c) stopFocus(); else startFocus(c);
+    } else if (a === "add-subject") { openCatModal(); return; }
+    else if (a === "prev" || a === "next") { const d = parse(tpMonth); d.setDate(1); d.setMonth(d.getMonth() + (a === "prev" ? -1 : 1)); tpMonth = ymd(d); }
+    else if (a === "stickers") { openStickers(); return; }
+    render();
+  });
+  // ---- sticker settings ----
+  function openStickers(){ renderStickers(); $("#stkModal").hidden = false; }
+  function renderStickers(){
+    $("#stkList").innerHTML = STAGE_NAMES.map((n, i) =>
+      '<li class="stk-row" data-stage="' + i + '"><span class="pv">' + stickerHTML(i) + "</span>" +
+      '<span class="info"><b>' + n + "</b>" + (i === 0 ? "<span>처음부터</span>" : '<span><input type="text" inputmode="numeric" data-stk="min" value="' + settings.stages[i] + '" aria-label="' + n + ' 시작 시간(분)"> 분부터</span>') + "</span>" +
+      '<span class="btns">' + (canUpload() ? '<label>PNG 바꾸기<input type="file" accept="image/png,image/*" data-stk="file" aria-label="' + n + ' 스티커 올리기"></label>' : "") +
+      (settings.stickers[i] ? '<button type="button" class="mini always" data-stk="reset">기본으로</button>' : "") + "</span></li>").join("");
+  }
+  async function toPng(file){
+    try {
+      const bmp = await createImageBitmap(file);
+      const k = Math.min(1, 512 / Math.max(bmp.width, bmp.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+      c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+      return await new Promise((res) => c.toBlob((b) => res(b || file), "image/png"));
+    } catch (e) { return file; }
+  }
+  $("#stkList").addEventListener("change", async (e) => {
+    const row = e.target.closest("[data-stage]"); if (!row) return;
+    const i = Number(row.dataset.stage);
+    if (e.target.dataset.stk === "min") {
+      const v = parseInt(e.target.value, 10);
+      const st = settings.stages.slice();
+      if (!(v > st[i - 1]) || (i < 5 && !(v < st[i + 1]))) { e.target.value = st[i]; showToast("앞 단계보다 크고 다음 단계보다 작아야 해요"); return; }
+      st[i] = v; commitSettings({stages: st}); renderStickers(); return;
+    }
+    if (e.target.dataset.stk !== "file") return;
+    const file = e.target.files && e.target.files[0]; e.target.value = "";
+    if (!file || !canUpload()) return;
+    if (!navigator.onLine) { showToast("오프라인 상태예요"); return; }
+    try {
+      const blob = await toPng(file);
+      const path = uid + "/sticker/" + newId("s") + ".png";
+      const up = await sb.storage.from("covers").upload(path, blob, {contentType: "image/png", cacheControl: "31536000", upsert: false});
+      if (up.error) throw up.error;
+      const sg = await sb.storage.from("covers").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (sg.error) throw sg.error;
+      const list = settings.stickers.slice(); while (list.length < 6) list.push(null);
+      const old = list[i]; list[i] = {path, url: sg.data.signedUrl};
+      commitSettings({stickers: list});
+      if (old && old.path) sb.storage.from("covers").remove([old.path]).catch(() => {});
+      renderStickers();
+    } catch (err) { console.warn("sticker", err); showToast("스티커를 올리지 못했어요"); }
+  });
+  $("#stkList").addEventListener("click", (e) => {
+    const b = e.target.closest('[data-stk="reset"]'); if (!b) return;
+    const i = Number(b.closest("[data-stage]").dataset.stage);
+    const list = settings.stickers.slice(); const old = list[i]; list[i] = null;
+    commitSettings({stickers: list});
+    if (old && old.path && sb) sb.storage.from("covers").remove([old.path]).catch(() => {});
+    renderStickers();
+  });
+  $("#stkClose").addEventListener("click", () => { $("#stkModal").hidden = true; render(); });
+  $("#stkModal").addEventListener("click", (e) => { if (e.target.id === "stkModal") { $("#stkModal").hidden = true; render(); } });
+
   // ================= diary =================
   const MOODS = [
     {k: "great", name: "최고", color: "#f7c948"},
@@ -2452,6 +2705,12 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       const legacy = (it.spent || 0) - logged;
       if (legacy > 60000) add(ymd(new Date(it.doneAt || it.updatedAt || now)), cat, legacy);
     }
+    const validCat = (c) => (c && settings.categories.some((x) => x.id === c)) ? c : "";
+    for (const [, d] of items) {
+      if (d.kind !== "studyday" || d.deleted) continue;
+      for (const ss of (Array.isArray(d.sessions) ? d.sessions : [])) add(ymd(new Date(ss.s)), validCat(ss.c), ss.e - ss.s);
+    }
+    if (settings.focus) add(ymd(new Date(settings.focus.start)), validCat(settings.focus.categoryId), now - settings.focus.start);
     return byDay;
   }
   function statsHTML(){
