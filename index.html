@@ -1344,12 +1344,18 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   }
   const empty = (msg) => '<div class="empty">' + msg + "</div>";
 
+  let diaryRenderLater = false;
+  const writingDiary = () => { const a = document.activeElement; return !!(a && a.classList && a.classList.contains("dy-text")); };
+  document.addEventListener("focusout", (e) => { if (diaryRenderLater && e.target.classList && e.target.classList.contains("dy-text")) { diaryRenderLater = false; setTimeout(() => { if (!writingDiary()) render(); }, 0); } });
   function render(){
     if (drag) { renderPending = true; return; }
+    const scrollY = window.scrollY;
     const ae = document.activeElement;
     let keep = null;
     if (ae && ae.dataset && ae.dataset.field && ae.closest("#content [data-id]")) {
       keep = {id: ae.closest("[data-id]").dataset.id, field: ae.dataset.field, s: ae.selectionStart, e: ae.selectionEnd};
+    } else if (ae && ae.classList && ae.classList.contains("dy-text")) {
+      keep = {diary: ae.dataset.field, s: ae.selectionStart, e: ae.selectionEnd};
     }
     const b = buckets();
     const t = today();
@@ -1409,8 +1415,9 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     renderAddSelects();
 
     if (keep) {
-      const el = document.querySelector('#content [data-id="' + CSS.escape(keep.id) + '"] [data-field="' + keep.field + '"]');
-      if (el) { el.focus(); try { el.setSelectionRange(keep.s, keep.e); } catch (e) {} }
+      const el = keep.diary ? document.querySelector('#content .dy-text[data-field="' + keep.diary + '"]') : document.querySelector('#content [data-id="' + CSS.escape(keep.id) + '"] [data-field="' + keep.field + '"]');
+      if (el) { el.focus({preventScroll: true}); try { el.setSelectionRange(keep.s, keep.e); } catch (e) {} }
+      if (Math.abs(window.scrollY - scrollY) > 2) window.scrollTo(0, scrollY);
     }
     updateTimerBar();
     updateStatus();
@@ -1554,7 +1561,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   content.addEventListener("input", (e) => {
     const f = e.target.dataset.field;
     if (f !== "title" && f !== "note") return;
-    if (f === "title") { e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; if (/\n/.test(e.target.value)) e.target.value = e.target.value.replace(/\s*\n\s*/g, " "); }
+    if (f === "title") { growArea(e.target, 0); if (/\n/.test(e.target.value)) e.target.value = e.target.value.replace(/\s*\n\s*/g, " "); }
     const id = e.target.closest("[data-id]").dataset.id;
     const cur = items.get(id); if (!cur) return;
     commit(id, Object.assign({}, cur, {[f]: e.target.value}));
@@ -2847,11 +2854,19 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     h += "</div></div>";
     return h;
   }
-  function fitDiary(){ content.querySelectorAll(".dy-text").forEach((t) => { t.style.height = "auto"; t.style.height = Math.max(180, t.scrollHeight + 2) + "px"; }); }
+  // measure height without letting the page shrink for a moment (that is what made the scroll jump)
+  function growArea(t, min){
+    const y = window.scrollY, doc = document.documentElement, keepH = doc.style.minHeight;
+    doc.style.minHeight = doc.scrollHeight + "px";
+    t.style.height = "auto"; t.style.height = Math.max(min || 0, t.scrollHeight + 2) + "px";
+    doc.style.minHeight = keepH;
+    if (window.scrollY !== y) window.scrollTo(0, y);
+  }
+  function fitDiary(){ content.querySelectorAll(".dy-text").forEach((t) => growArea(t, 180)); }
   content.addEventListener("input", (e) => {
     const f = e.target.dataset && e.target.dataset.field;
     if (f !== "diaryText" && f !== "diaryEn") return;
-    e.target.style.height = "auto"; e.target.style.height = Math.max(180, e.target.scrollHeight + 2) + "px";
+    growArea(e.target, 180);
     const before = diaryOf(diarySel);
     const patch = f === "diaryText" ? {text: e.target.value} : {textEn: e.target.value};
     // remember which question was showing when writing started, so it stays with the entry
@@ -3398,7 +3413,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
           since = r.server_ts;
           if (outbox[r.id]) continue;
           if (!r.data || r.data.purged) { if (items.delete(r.id)) changed = true; }
-          else { items.set(r.id, r.data); changed = true; }
+          else { const cur = items.get(r.id); if (!cur || JSON.stringify(cur) !== JSON.stringify(r.data)) { items.set(r.id, r.data); changed = true; } }
         }
         if (data.length < 1000) break;
       }
@@ -3413,7 +3428,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       if (lastError === "offline") lastError = null;
       if (changed) { lsSet(CACHE_KEY, Object.fromEntries(items)); lsSet(SETTINGS_KEY, settings); }
       if (!firstPullDone) { firstPullDone = true; migrate(); }
-      if (changed && !drag && !editingTime && $("#catModal").hidden) render();
+      if (changed && !drag && !editingTime && $("#catModal").hidden) { if (writingDiary()) diaryRenderLater = true; else render(); }
     } catch (e) {
       if (isNetErr(e)) lastError = "offline";
       console.warn("pull", e);
