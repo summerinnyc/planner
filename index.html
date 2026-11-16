@@ -490,6 +490,48 @@ body[data-section="timer"] .cats,body[data-section="diary"] .cats{display:none!i
 .rv{background:color-mix(in srgb, var(--ink) 4%, transparent);padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:13.5px}
 .rv b{font-size:14px}
 .rt-box{width:min(520px,100%)}
+/* goals & decisions */
+.gl-tabs{display:flex;gap:6px}
+.gl-tabs .cal-btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.gl-head{border:0;background:transparent;text-align:left;padding:0;display:flex;flex-direction:column;gap:2px;cursor:pointer;width:100%;color:inherit}
+.gl-card.done .rt-name{color:var(--muted)}
+.gl-bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.gl-bar i{display:block;height:100%;background:var(--ink)}
+.gl-next{font-size:13.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.gl-next>span.k{font-size:11px;border:1px solid var(--ink);border-radius:999px;padding:1px 8px;white-space:nowrap}
+.gl-next>span.t{flex:1;min-width:120px;overflow-wrap:anywhere}
+.gl-body{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+.gl-why{font-size:13.5px;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}
+.gl-sec{font-size:12.5px;color:var(--muted);margin-top:4px}
+.gl-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.gl-list li{display:flex;align-items:flex-start;gap:8px;font-size:14.5px;padding:4px 0}
+.gl-list li .tx{flex:1;overflow-wrap:anywhere;line-height:1.45}
+.gl-list li.done .tx{color:var(--muted);text-decoration:line-through}
+.gl-list li.plain::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--muted);margin:9px 2px 0 2px;flex:none}
+.gl-chk{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--ink);background:transparent;flex:none;margin-top:1px;padding:0}
+.gl-chk[aria-pressed="true"]{background:var(--ink);box-shadow:inset 0 0 0 3px var(--paper)}
+.gl-x{border:0;background:transparent;color:var(--muted);padding:0 4px;font-size:17px;line-height:1.2;flex:none}
+.gl-x:hover{color:var(--alert)}
+.gl-todo{border:1px solid var(--line);border-radius:999px;background:transparent;font-size:12px;padding:2px 9px;color:var(--ink);white-space:nowrap;flex:none}
+.gl-tag{font-size:12px;color:var(--muted);white-space:nowrap;flex:none}
+.gl-addrow{display:flex;gap:6px;align-items:center}
+.gl-in{border:0;border-bottom:1.5px solid var(--line);background:transparent;padding:6px 2px;font-size:14.5px;outline:none;width:100%;color:var(--ink);border-radius:0}
+.gl-in:focus{border-bottom-color:var(--ink)}
+.gl-plus{border:1px solid var(--line);background:transparent;border-radius:50%;width:28px;height:28px;flex:none;padding:0;font-size:16px;line-height:1;color:var(--ink)}
+textarea.gl-note{border:1px solid var(--line);padding:8px 10px;min-height:70px;resize:none;line-height:1.55;overflow:hidden}
+textarea.gl-note:focus{border-color:var(--ink)}
+.dc-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.dc-opt{border:1px solid var(--line);padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.dc-opt.lean{border-color:var(--ink)}
+.dc-opt h4{margin:0;font-size:14.5px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.gl-chips{display:flex;flex-wrap:wrap;gap:6px}
+.gl-chips button{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:5px 11px;font-size:13px;cursor:pointer}
+.gl-chips button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.gl-nudge{display:flex;flex-direction:column;gap:4px;margin:0 0 18px}
+.gl-nudge button{border:1px solid var(--line);background:transparent;text-align:left;padding:9px 12px;font-size:14px;display:flex;gap:10px;align-items:center;color:var(--ink)}
+.gl-nudge button span{font-family:var(--font-num);font-size:12px;border:1px solid var(--ink);border-radius:999px;padding:1px 8px;white-space:nowrap}
+.rt-form input[type="date"]{border:0;border-bottom:1.5px solid var(--line);background:transparent;padding:6px 2px;font-size:15px;color:var(--ink);outline:none}
+.rt-form textarea{border:1px solid var(--line);background:transparent;padding:8px 10px;font-size:15px;color:var(--ink);outline:none;min-height:64px;resize:vertical}
 .rt-form{display:flex;flex-direction:column;gap:12px}
 .rt-form label.blk2{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
 .rt-form input[type="text"]{border:0;border-bottom:1.5px solid var(--line);background:transparent;padding:6px 2px;font-size:15px;color:var(--ink);outline:none}
@@ -794,6 +836,10 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   .ts-time{font-size:58px}
   .modal{padding:40px 14px}
   .modal-box{border-radius:16px}
+  .gl-in,.rt-form textarea{font-size:16px}
+  .gl-nudge button,.dc-opt,textarea.gl-note{border-radius:12px}
+  .gl-todo{padding:5px 11px;font-size:12.5px}
+  .gl-x{padding:2px 8px}
 }
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
@@ -815,6 +861,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       <button data-view="upcoming"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="lbl">예정</span><span class="n" data-count="upcoming"></span></button>
       <button data-view="someday"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 13.5 6.5 5h11l3 8.5V19a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19z"/><path d="M3.5 13.5H8l1.2 2.2h5.6l1.2-2.2h4.5"/></svg><span class="lbl">언젠가</span><span class="n" data-count="someday"></span></button>
       <button data-view="routine"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2.5l3 3-3 3"/><path d="M4 11.5V10a4.5 4.5 0 0 1 4.5-4.5H20"/><path d="M7 21.5l-3-3 3-3"/><path d="M20 12.5V14a4.5 4.5 0 0 1-4.5 4.5H4"/></svg><span class="lbl">루틴</span><span class="n" data-count="routine"></span></button>
+      <button data-view="goal"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 21V4"/><path d="M5.5 4.5h11l-2 3.75 2 3.75h-11"/></svg><span class="lbl">목표·고민</span><span class="n" data-count="goal"></span></button>
       <button data-view="calendar"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="lbl">캘린더</span><span class="n"></span></button>
       <button data-view="diary"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h10.5A1.5 1.5 0 0 1 18 5v15.5H7A2 2 0 0 1 5 18.5v-13a2 2 0 0 1 1-2z"/><path d="M5 18.5A2 2 0 0 1 7 16.5h11"/><path d="M9 8h5.5M9 11.5h4"/></svg><span class="lbl">일기</span><span class="n"></span></button>
       <button data-view="timer"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M12 2.5V5"/></svg><span class="lbl">타이머</span><span class="n"></span></button>
@@ -980,8 +1027,8 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   const FIRED_KEY = "planner.fired.v1", ALARM_KEY = "planner.alarm";
   const SETTINGS_ID = "__settings";
   const WD = "일월화수목금토", WD_EN = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
-  const VIEWS = {today:"오늘", upcoming:"예정", someday:"언젠가", calendar:"캘린더", study:"학습", routine:"루틴", diary:"일기", timer:"타이머", done:"완료", trash:"휴지통"};
-  const TODO_VIEWS = ["today", "upcoming", "someday", "routine", "done", "trash"];
+  const VIEWS = {today:"오늘", upcoming:"예정", someday:"언젠가", calendar:"캘린더", study:"학습", routine:"루틴", goal:"목표·고민", diary:"일기", timer:"타이머", done:"완료", trash:"휴지통"};
+  const TODO_VIEWS = ["today", "upcoming", "someday", "routine", "goal", "done", "trash"];
   const SORTS = {datetime:"날짜·시간순", due:"마감 임박순", created:"등록순", manual:"직접 정렬"};
   const REMIND = [["", "없음"], ["0", "정각"], ["5", "5분 전"], ["10", "10분 전"], ["30", "30분 전"], ["60", "1시간 전"], ["1440", "하루 전"]];
   const TRASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>';
@@ -1345,8 +1392,9 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   const empty = (msg) => '<div class="empty">' + msg + "</div>";
 
   let diaryRenderLater = false;
-  const writingDiary = () => { const a = document.activeElement; return !!(a && a.classList && a.classList.contains("dy-text")); };
-  document.addEventListener("focusout", (e) => { if (diaryRenderLater && e.target.classList && e.target.classList.contains("dy-text")) { diaryRenderLater = false; setTimeout(() => { if (!writingDiary()) render(); }, 0); } });
+  const isWriteBox = (a) => !!(a && a.classList && (a.classList.contains("dy-text") || a.classList.contains("gl-in")));
+  const writingDiary = () => isWriteBox(document.activeElement);
+  document.addEventListener("focusout", (e) => { if (diaryRenderLater && isWriteBox(e.target)) { setTimeout(() => { if (diaryRenderLater && !writingDiary()) { diaryRenderLater = false; render(); } }, 250); } });
   function render(){
     if (drag) { renderPending = true; return; }
     const scrollY = window.scrollY;
@@ -1362,6 +1410,8 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     let html = "";
     if (view === "routine") {
       html = routinePageHTML();
+    } else if (view === "goal") {
+      html = goalPageHTML();
     } else if (view === "calendar") {
       html = calendarHTML();
     } else if (view === "timer") {
@@ -1371,7 +1421,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     } else if (view === "study") {
       html = studyHTML();
     } else if (view === "today") {
-      html = routineCardHTML() + todayClassesHTML() + group("지난 일", b.late, "late", true) + group("남은 일", b.today) + group("오늘 완료", b.doneToday);
+      html = routineCardHTML() + decisionNudgeHTML() + todayClassesHTML() + group("지난 일", b.late, "late", true) + group("남은 일", b.today) + group("오늘 완료", b.doneToday);
       if (!html) html = empty("없음");
     } else if (view === "upcoming") {
       if (settings.sort === "datetime") {
@@ -1398,16 +1448,17 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     $("#content").innerHTML = html;
     fitTitles();
     if (view === "diary") fitDiary();
+    if (view === "goal") content.querySelectorAll(".gl-note").forEach((t) => growArea(t, 70));
     const catName = filterCat === "none" ? "미분류" : (filterCat && (settings.categories.find((c) => c.id === filterCat) || {}).name);
     $("#viewTitle").textContent = VIEWS[view] + (catName ? " · " + catName : "");
     const special = view === "calendar" || view === "study" || view === "diary" || view === "timer";
-    $("#addForm").hidden = (view === "done" || view === "trash" || view === "routine" || special);
-    $("#listbar").hidden = (view === "done" || view === "trash" || view === "routine" || special);
+    $("#addForm").hidden = (view === "done" || view === "trash" || view === "routine" || view === "goal" || special);
+    $("#listbar").hidden = (view === "done" || view === "trash" || view === "routine" || view === "goal" || special);
     document.body.dataset.section = special ? view : "todo";
     $("#viewTitle").hidden = view === "calendar";
     document.querySelectorAll("#tabbar [data-tab]").forEach((t) => t.setAttribute("aria-current", String(t.dataset.tab === document.body.dataset.section)));
 
-    const counts = {routine: routinesLeftToday(),today: b.late.length + b.today.length, upcoming: b.upcoming.length, someday: b.someday.length, done: b.done.length, trash: b.trash.length};
+    const counts = {routine: routinesLeftToday(), goal: decisions().filter((d) => d.status !== "decided").length,today: b.late.length + b.today.length, upcoming: b.upcoming.length, someday: b.someday.length, done: b.done.length, trash: b.trash.length};
     document.querySelectorAll("[data-count]").forEach((el) => { const n = counts[el.dataset.count]; el.textContent = n ? n : ""; });
     document.querySelectorAll("#nav button").forEach((btn) => btn.setAttribute("aria-current", btn.dataset.view === view ? "true" : "false"));
     renderCats();
@@ -2482,7 +2533,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   let rtDraft = null, finderPicks = new Set();
   const activeCount = () => routines().filter((r) => !r.paused).length;
   function openRtModal(title, html){ $("#rtTitle").textContent = title; $("#rtBody").innerHTML = html; $("#rtModal").hidden = false; }
-  function closeRtModal(){ $("#rtModal").hidden = true; rtDraft = null; render(); }
+  function closeRtModal(){ $("#rtModal").hidden = true; rtDraft = null; glDraft = null; render(); }
   function openFinder(){
     const rows = () => {
       const picks = [...finderPicks];
@@ -2548,6 +2599,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   });
   $("#rtModal").addEventListener("submit", (e) => {
     e.preventDefault();
+    if (e.target.id === "glForm" || e.target.id === "dcForm") return;
     const f = e.target.elements;
     if (e.target.id === "qtForm") {
       commit(newId("q"), {kind: "quit", title: f.title.value.trim(), instead: f.instead.value.trim(), trigger: f.trigger.value.trim(), log: {}, createdAt: Date.now(), deleted: false});
@@ -2561,6 +2613,212 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     closeRtModal();
   });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#rtModal").hidden) closeRtModal(); });
+
+  // ================= goals & decisions =================
+  // goal:     {kind:"goal", title, when, date, why, status: doing|idea|done, steps:[{id,text,done,taskId}], routineIds:[]}
+  // decision: {kind:"decision", title, due, options:[{id,name,pros:[],cons:[]}], unknowns:[step], lean, note, status: open|decided, choice}
+  const byCreated = (a, b) => (a.createdAt || 0) - (b.createdAt || 0);
+  function goals(){ return allKind("goal").filter((g) => !g.deleted).sort(byCreated); }
+  function decisions(){ return allKind("decision").filter((g) => !g.deleted).sort(byCreated); }
+  let glTab = "goals", glOpen = null, glDraft = null;
+  const linkedTask = (st) => { const t = st.taskId && items.get(st.taskId); return t && !t.deleted && !t.purged ? t : null; };
+  const stepDone = (st) => { const t = linkedTask(st); return !!(st.done || (t && t.done)); };
+  const farDate = (d) => d.slice(0, 4) === today().slice(0, 4) ? fmtDate(d) : d.replace(/-/g, ".");
+  const X = "&times;";
+  function stepListHTML(list, key){
+    return '<ul class="gl-list">' + list.map((st, i) => { const dn = stepDone(st), t = linkedTask(st);
+      return '<li data-i="' + i + '" data-k="' + key + '"' + (dn ? ' class="done"' : "") + '><button type="button" class="gl-chk" data-glp="chk" aria-pressed="' + dn + '" aria-label="완료"></button><span class="tx">' + esc(st.text) + "</span>" +
+        (dn ? "" : t ? '<span class="gl-tag">할 일에 있음</span>' : '<button type="button" class="gl-todo" data-glp="todo">오늘 할 일로</button>') +
+        '<button type="button" class="gl-x" data-glp="del-li" aria-label="삭제">' + X + "</button></li>"; }).join("") + "</ul>";
+  }
+  const addRow = (kind, ph, opt) => '<div class="gl-addrow"><input type="text" class="gl-in" data-gadd="' + kind + '"' + (opt ? ' data-opt="' + esc(opt) + '"' : "") + ' placeholder="' + esc(ph) + '" enterkeyhint="done" autocomplete="off"><button type="button" class="gl-plus" data-glp="add" aria-label="추가">+</button></div>';
+  function goalCardHTML(g){
+    const steps = g.steps || [], dn = steps.filter(stepDone).length, open = glOpen === g.id;
+    const next = steps.find((st) => !stepDone(st));
+    const meta = [g.when, g.date ? farDate(g.date) + (g.status === "done" ? "" : " · " + dday(g.date)) : "", steps.length ? dn + "/" + steps.length : ""].filter(Boolean).join(" · ");
+    let h = '<div class="rt-card gl-card' + (g.status === "done" ? " done" : "") + '" data-gl="' + esc(g.id) + '">' +
+      '<button type="button" class="gl-head" data-glp="toggle" aria-expanded="' + open + '"><span class="rt-name">' + esc(g.title) + "</span>" + (meta ? '<span class="rt-sub">' + esc(meta) + "</span>" : "") + "</button>";
+    if (steps.length && g.status !== "done") h += '<div class="gl-bar"><i style="width:' + Math.round(dn / steps.length * 100) + '%"></i></div>';
+    if (!open) {
+      if (g.status === "doing" && next) { const t = linkedTask(next); h += '<div class="gl-next" data-i="' + steps.indexOf(next) + '"><span class="k">다음</span><span class="t">' + esc(next.text) + "</span>" + (t ? '<span class="gl-tag">할 일에 있음</span>' : '<button type="button" class="gl-todo" data-glp="todo-next">오늘 할 일로</button>') + "</div>"; }
+      return h + "</div>";
+    }
+    h += '<div class="gl-body">';
+    if (g.why) h += '<div class="gl-why">' + esc(g.why) + "</div>";
+    h += '<div class="gl-sec">단계</div>' + stepListHTML(steps, "steps") + addRow("step", "작은 단계 하나 (예: 접수 일정 확인)");
+    const rs = (g.routineIds || []).map((id) => items.get(id)).filter((r) => r && !r.deleted);
+    if (rs.length) h += '<div class="gl-sec">루틴</div><ul class="gl-list">' + rs.map((r) => { const st = weekStats(r); return '<li class="plain"><span class="tx">' + esc(r.title) + '</span><span class="gl-tag">이번 주 ' + st.done + "/" + st.goal + "</span></li>"; }).join("") + "</ul>";
+    h += '<div class="rt-btns"><button type="button" class="mini always" data-glp="edit">수정</button>' +
+      (g.status === "idea" ? '<button type="button" class="mini always" data-glp="status" data-st="doing">시작하기</button>' : "") +
+      (g.status === "doing" ? '<button type="button" class="mini always" data-glp="status" data-st="idea">언젠가로</button>' : "") +
+      (g.status === "done" ? '<button type="button" class="mini always" data-glp="status" data-st="doing">다시 진행</button>' : '<button type="button" class="mini always" data-glp="status" data-st="done">이뤘어요</button>') +
+      '<button type="button" class="mini always danger" data-glp="del">삭제</button></div></div>';
+    return h + "</div>";
+  }
+  const THINK = ["1년 뒤의 나는 어느 쪽을 고마워할까?", "안 하면 아쉬울까, 하면 후회할까?", "친구가 같은 고민을 하면 뭐라고 말해 줄까?", "가장 걱정되는 일이 실제로 일어나면 어떻게 될까?", "지금 정하지 않으면 어떤 일이 생길까?"];
+  function decisionCardHTML(d){
+    const open = glOpen === d.id, opts = d.options || [], decided = d.status === "decided";
+    const name = (id) => (opts.find((o) => o.id === id) || {}).name || "";
+    const meta = decided ? "→ " + name(d.choice) + (d.decidedAt ? " · " + fmtDate(ymd(new Date(d.decidedAt))) + " 결정" : "")
+      : [d.due ? farDate(d.due) + "까지 · " + dday(d.due) : "", d.lean && name(d.lean) ? "지금은 " + name(d.lean) + " 쪽" : ""].filter(Boolean).join(" · ");
+    let h = '<div class="rt-card gl-card' + (decided ? " done" : "") + '" data-gl="' + esc(d.id) + '">' +
+      '<button type="button" class="gl-head" data-glp="toggle" aria-expanded="' + open + '"><span class="rt-name">' + esc(d.title) + "</span>" + (meta ? '<span class="rt-sub">' + esc(meta) + "</span>" : "") + "</button>";
+    if (!open) return h + "</div>";
+    h += '<div class="gl-body"><div class="dc-opts">' + opts.map((o) => {
+      const li = (arr, k) => '<ul class="gl-list">' + (arr || []).map((tx, i) => '<li class="plain" data-i="' + i + '" data-k="' + k + '"><span class="tx">' + esc(tx) + '</span><button type="button" class="gl-x" data-glp="del-li" aria-label="삭제">' + X + "</button></li>").join("") + "</ul>";
+      return '<div class="dc-opt' + ((decided ? d.choice : d.lean) === o.id ? " lean" : "") + '" data-optid="' + esc(o.id) + '"><h4><span>' + esc(o.name) + "</span>" + (!decided && opts.length > 2 ? '<button type="button" class="gl-x" data-glp="del-opt" aria-label="선택지 삭제">' + X + "</button>" : "") + "</h4>" +
+        '<div class="gl-sec">좋은 점</div>' + li(o.pros, "pros") + (decided ? "" : addRow("pros", "좋은 점", o.id)) +
+        '<div class="gl-sec">걸리는 점</div>' + li(o.cons, "cons") + (decided ? "" : addRow("cons", "걸리는 점", o.id)) + "</div>"; }).join("") + "</div>";
+    if (!decided) h += addRow("opt", "다른 선택지 추가");
+    h += '<div class="gl-sec">아직 모르는 것 · 알아볼 것</div>' + stepListHTML(d.unknowns || [], "unknowns") + (decided ? "" : addRow("unk", "예: 선배한테 업무량 물어보기"));
+    h += '<textarea class="gl-in gl-note" data-gnote placeholder="' + esc(THINK[(d.createdAt || 0) % THINK.length]) + '" aria-label="생각 메모">' + esc(d.note || "") + "</textarea>";
+    if (!decided) {
+      h += '<div class="gl-sec">지금 마음</div><div class="gl-chips">' + opts.map((o) => '<button type="button" data-glp="lean" data-opt="' + esc(o.id) + '" aria-pressed="' + (d.lean === o.id) + '">' + esc(o.name) + "</button>").join("") + '<button type="button" data-glp="lean" data-opt="" aria-pressed="' + !d.lean + '">모르겠음</button></div>';
+      h += '<div class="rt-btns"><button type="button" class="mini always" data-glp="edit">수정</button>' + (d.lean && name(d.lean) ? '<button type="button" class="mini always" data-glp="decide"><b>' + esc(name(d.lean)) + "</b>(으)로 결정</button>" : "") + '<button type="button" class="mini always danger" data-glp="del">삭제</button></div>';
+    } else {
+      h += '<div class="rt-btns"><button type="button" class="mini always" data-glp="to-goal">목표로 만들기</button><button type="button" class="mini always" data-glp="undecide">다시 고민하기</button><button type="button" class="mini always danger" data-glp="del">삭제</button></div>';
+    }
+    return h + "</div></div>";
+  }
+  function goalPageHTML(){
+    const gs = goals(), ds = decisions(), openDs = ds.filter((d) => d.status !== "decided");
+    let h = '<div class="rt-page gl-page"><div class="gl-tabs"><button type="button" class="cal-btn" data-glp="tab" data-tab="goals" aria-pressed="' + (glTab === "goals") + '">목표</button><button type="button" class="cal-btn" data-glp="tab" data-tab="decisions" aria-pressed="' + (glTab === "decisions") + '">고민' + (openDs.length ? " " + openDs.length : "") + "</button></div>";
+    const sec = (title, list, btn, emptyMsg, fn) => '<section class="st-sec" style="margin:0"><div class="st-head"><h3>' + title + "</h3>" + (btn || "") + '</div><div style="display:flex;flex-direction:column;gap:10px">' + (list.length ? list.map(fn).join("") : emptyMsg ? '<div class="empty">' + emptyMsg + "</div>" : "") + "</div></section>";
+    if (glTab === "goals") {
+      const by = (st) => gs.filter((g) => (g.status || "idea") === st);
+      h += sec("진행 중", by("doing").sort((a, b) => (a.date || "9999").localeCompare(b.date || "9999")), '<button type="button" class="cal-btn" data-glp="new-goal" data-status="doing">+ 추가</button>', "없음", goalCardHTML);
+      h += sec("언젠가 · 버킷리스트", by("idea"), '<button type="button" class="cal-btn" data-glp="new-goal" data-status="idea">+ 추가</button>', "없음", goalCardHTML);
+      if (by("done").length) h += sec("이룬 것", by("done").sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)), "", "", goalCardHTML);
+    } else {
+      h += sec("고민 중", openDs.sort((a, b) => (a.due || "9999").localeCompare(b.due || "9999")), '<button type="button" class="cal-btn" data-glp="new-dc">+ 추가</button>', "없음", decisionCardHTML);
+      const dd = ds.filter((d) => d.status === "decided").sort((a, b) => (b.decidedAt || 0) - (a.decidedAt || 0));
+      if (dd.length) h += sec("결정한 것", dd, "", "", decisionCardHTML);
+    }
+    return h + "</div>";
+  }
+  function decisionNudgeHTML(){
+    const t = today();
+    const l = decisions().filter((d) => d.status !== "decided" && d.due && diffDays(d.due, t) <= 3);
+    if (!l.length) return "";
+    return '<div class="gl-nudge">' + l.map((d) => '<button type="button" data-glp="nudge" data-id="' + esc(d.id) + '"><span>' + dday(d.due) + "</span>" + esc(d.title) + "</button>").join("") + "</div>";
+  }
+  function stepToTodo(st){
+    const now = Date.now(), id = newId();
+    commit(id, {kind: "task", title: st.text, note: "", date: today(), time: "", due: "", categoryId: null, remind: null, done: false, doneAt: null, deleted: false, createdAt: now, order: now, spent: 0, timerStart: null, timerGoal: null});
+    return id;
+  }
+  const glUpd = (id, patch) => commit(id, Object.assign({}, items.get(id), patch));
+  function glAdd(inp){
+    const v = inp.value.trim(); if (!v) { inp.focus(); return; }
+    const card = inp.closest("[data-gl]"); if (!card) return;
+    const id = card.dataset.gl, it = items.get(id); if (!it) return;
+    const kind = inp.dataset.gadd, oid = inp.dataset.opt || "";
+    if (kind === "step") glUpd(id, {steps: (it.steps || []).concat([{id: newId("s"), text: v, done: false}])});
+    else if (kind === "unk") glUpd(id, {unknowns: (it.unknowns || []).concat([{id: newId("s"), text: v, done: false}])});
+    else if (kind === "opt") glUpd(id, {options: (it.options || []).concat([{id: newId("o"), name: v, pros: [], cons: []}])});
+    else if (kind === "pros" || kind === "cons") glUpd(id, {options: (it.options || []).map((o) => o.id === oid ? Object.assign({}, o, {[kind]: (o[kind] || []).concat([v])}) : o)});
+    else return;
+    render();
+    const again = content.querySelector('[data-gl="' + CSS.escape(id) + '"] [data-gadd="' + kind + '"]' + (oid ? '[data-opt="' + CSS.escape(oid) + '"]' : ""));
+    if (again) again.focus({preventScroll: true});
+  }
+  content.addEventListener("keydown", (e) => {
+    const inp = e.target; if (!inp.dataset || !inp.dataset.gadd) return;
+    if (e.key !== "Enter" || e.isComposing || e.keyCode === 229) return;
+    e.preventDefault(); glAdd(inp);
+  });
+  content.addEventListener("input", (e) => {
+    if (!e.target.dataset || e.target.dataset.gnote == null) return;
+    growArea(e.target, 70);
+    const card = e.target.closest("[data-gl]"); if (card && items.get(card.dataset.gl)) glUpd(card.dataset.gl, {note: e.target.value});
+  });
+  content.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-glp]"); if (!b) return;
+    const a = b.dataset.glp;
+    if (a === "tab") { glTab = b.dataset.tab; glOpen = null; render(); return; }
+    if (a === "new-goal") { openGoalForm(null, b.dataset.status); return; }
+    if (a === "new-dc") { openDecisionForm(null); return; }
+    if (a === "nudge") { glTab = "decisions"; glOpen = b.dataset.id; go("goal"); return; }
+    if (a === "add") { glAdd(b.parentElement.querySelector("[data-gadd]")); return; }
+    const card = b.closest("[data-gl]"); if (!card) return;
+    const id = card.dataset.gl, it = items.get(id); if (!it) return;
+    const row = b.closest("[data-i]"), i = row ? Number(row.dataset.i) : -1, k = row && row.dataset.k;
+    const optEl = b.closest("[data-optid]"), oid = optEl ? optEl.dataset.optid : "";
+    const undo = (msg) => showToast(msg, "되돌리기", () => { commit(id, it); render(); });
+    if (a === "toggle") glOpen = glOpen === id ? null : id;
+    else if (a === "chk") {
+      const list = (it[k] || []).slice(), st = list[i]; if (!st) return;
+      const was = stepDone(st), t = linkedTask(st);
+      list[i] = Object.assign({}, st, {done: !was});
+      if (t && t.done === was) commit(st.taskId, Object.assign({}, t, {done: !was, doneAt: !was ? Date.now() : null}));
+      glUpd(id, {[k]: list});
+    } else if (a === "todo" || a === "todo-next") {
+      const key = a === "todo-next" ? "steps" : k, list = (it[key] || []).slice(), st = list[i]; if (!st) return;
+      list[i] = Object.assign({}, st, {taskId: stepToTodo(st)});
+      glUpd(id, {[key]: list}); showToast("오늘 할 일에 넣었어요");
+    } else if (a === "del-li") {
+      if (k === "pros" || k === "cons") glUpd(id, {options: it.options.map((o) => o.id === oid ? Object.assign({}, o, {[k]: o[k].filter((_, j) => j !== i)}) : o)});
+      else glUpd(id, {[k]: (it[k] || []).filter((_, j) => j !== i)});
+    } else if (a === "del-opt") { glUpd(id, {options: it.options.filter((o) => o.id !== oid), lean: it.lean === oid ? "" : it.lean}); undo("선택지 삭제됨"); }
+    else if (a === "status") { const st = b.dataset.st; glUpd(id, {status: st, doneAt: st === "done" ? Date.now() : null}); if (st === "done") { glOpen = null; undo("이뤘어요. 축하해요"); } }
+    else if (a === "lean") glUpd(id, {lean: b.dataset.opt || ""});
+    else if (a === "decide") { glUpd(id, {status: "decided", choice: it.lean, decidedAt: Date.now()}); undo("결정했어요"); }
+    else if (a === "undecide") glUpd(id, {status: "open", choice: "", decidedAt: null});
+    else if (a === "to-goal") { openGoalForm({title: it.title.replace(/\s*(할까( 말까)?|할지( 말지)?)?\s*\?*\s*$/, ""), why: it.note || ""}, "doing"); return; }
+    else if (a === "edit") { it.kind === "goal" ? openGoalForm(Object.assign({id}, it)) : openDecisionForm(Object.assign({id}, it)); return; }
+    else if (a === "del") { glUpd(id, {deleted: true}); if (glOpen === id) glOpen = null; undo("삭제됨"); }
+    else return;
+    render();
+  });
+  function openGoalForm(g, status){
+    glDraft = Object.assign({status: status || "idea", routineIds: []}, g || {});
+    glDraft.routineIds = (glDraft.routineIds || []).slice();
+    const rs = routines();
+    openRtModal(g && g.id ? "목표 수정" : "새 목표", '<form class="rt-form" id="glForm" autocomplete="off">' +
+      '<label class="blk2">목표<input type="text" name="title" value="' + esc(glDraft.title || "") + '" placeholder="예: 투운사 시험 응시" required></label>' +
+      '<label class="blk2">언제쯤 (선택)<input type="text" name="when" value="' + esc(glDraft.when || "") + '" placeholder="예: 3-1, 내년 여름"></label>' +
+      '<label class="blk2">정해진 날짜 (선택)<input type="date" name="date" value="' + esc(glDraft.date || "") + '"></label>' +
+      '<label class="blk2">왜 하고 싶은지 (선택)<textarea name="why" placeholder="나중에 흔들릴 때 다시 읽을 한 줄">' + esc(glDraft.why || "") + "</textarea></label>" +
+      '<div class="chips">' + [["doing", "지금 진행"], ["idea", "언젠가"]].concat(glDraft.status === "done" ? [["done", "이룬 것"]] : []).map(([k, l]) => '<button type="button" data-gst="' + k + '" aria-pressed="' + (glDraft.status === k) + '">' + l + "</button>").join("") + "</div>" +
+      (rs.length ? '<div class="blk2" style="font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px">연결할 루틴 (선택)<div class="chips">' + rs.map((r) => '<button type="button" data-grt="' + esc(r.id) + '" aria-pressed="' + glDraft.routineIds.includes(r.id) + '">' + esc(r.title) + "</button>").join("") + "</div></div>" : "") +
+      '<div class="foot"><button type="button" class="mini always" data-rtf="close">취소</button><button type="submit" class="primary">' + (g && g.id ? "저장" : "추가") + "</button></div></form>");
+    const f = $("#glForm input[name=title]"); if (f) f.focus();
+  }
+  function openDecisionForm(d){
+    glDraft = Object.assign({}, d || {});
+    openRtModal(d && d.id ? "고민 수정" : "새 고민", '<form class="rt-form" id="dcForm" autocomplete="off">' +
+      '<label class="blk2">고민<input type="text" name="title" value="' + esc(glDraft.title || "") + '" placeholder="예: RA 지원할까?" required></label>' +
+      (d && d.id ? "" : '<label class="blk2">선택지 (쉼표로 구분)<input type="text" name="options" value="한다, 안 한다"></label>') +
+      '<label class="blk2">언제까지 정해야 하는지 (선택)<input type="date" name="due" value="' + esc(glDraft.due || "") + '"></label>' +
+      '<div class="foot"><button type="button" class="mini always" data-rtf="close">취소</button><button type="submit" class="primary">' + (d && d.id ? "저장" : "추가") + "</button></div></form>");
+    const f = $("#dcForm input[name=title]"); if (f) f.focus();
+  }
+  $("#rtModal").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b || !glDraft) return;
+    if (b.dataset.gst) { glDraft.status = b.dataset.gst; b.parentElement.querySelectorAll("[data-gst]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); }
+    else if (b.dataset.grt) { const id = b.dataset.grt, j = glDraft.routineIds.indexOf(id); j >= 0 ? glDraft.routineIds.splice(j, 1) : glDraft.routineIds.push(id); b.setAttribute("aria-pressed", String(j < 0)); }
+  });
+  $("#rtModal").addEventListener("submit", (e) => {
+    if (e.target.id !== "glForm" && e.target.id !== "dcForm") return;
+    e.preventDefault();
+    const f = e.target.elements, title = f.title.value.trim(); if (!title) return;
+    const now = Date.now();
+    if (e.target.id === "glForm") {
+      const data = {title, when: f.when.value.trim(), date: f.date.value || "", why: f.why.value.trim(), status: glDraft.status, routineIds: glDraft.routineIds};
+      if (glDraft.id) glUpd(glDraft.id, data);
+      else { const id = newId("g"); commit(id, Object.assign({kind: "goal", steps: [], createdAt: now, deleted: false, doneAt: null}, data)); glOpen = id; }
+      glTab = "goals";
+    } else {
+      const data = {title, due: f.due.value || ""};
+      if (glDraft.id) glUpd(glDraft.id, data);
+      else {
+        let names = f.options.value.split(/[,，、]/).map((x) => x.trim()).filter(Boolean); if (names.length < 2) names = ["한다", "안 한다"];
+        const id = newId("d"); commit(id, Object.assign({kind: "decision", options: names.map((n, i) => ({id: "o" + i + now.toString(36), name: n, pros: [], cons: []})), unknowns: [], lean: "", note: "", status: "open", choice: "", createdAt: now, deleted: false}, data)); glOpen = id;
+      }
+      glTab = "decisions";
+    }
+    glDraft = null; closeRtModal();
+  });
 
   // ================= study timer =================
   const STAGE_NAMES = ["씨앗", "새싹", "떡잎", "꽃봉오리", "꽃", "만개"];
