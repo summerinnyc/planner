@@ -1,4 +1,4 @@
-// PLANNER_WIDGET v1 — Summer's planner, today's to-dos as an iPhone widget (runs inside the Scriptable app).
+// PLANNER_WIDGET v2 — Summer's planner, today's to-dos as an iPhone widget (runs inside the Scriptable app).
 // Loaded by a small loader script; do not paste this file directly.
 // Read-only: it signs in with the planner account kept in the phone's Keychain and reads today's tasks.
 
@@ -32,7 +32,7 @@ function pick(rows, settings, t) {
   const color = (i) => cats[i.categoryId] || null;
   const shape = (i, extra) => Object.assign({title: i.title || "", time: i.time || "", date: i.date || "", color: color(i)}, extra);
   return {
-    late: live.filter((i) => !i.done && i.date && i.date < t).sort(cmp).map((i) => shape(i, {late: true})),
+    later: live.filter((i) => !i.done && i.date && i.date > t).sort(cmp).map((i) => shape(i, {later: true})),
     today: live.filter((i) => !i.done && i.date === t).sort(cmp).map((i) => shape(i, {})),
     done: live.filter((i) => i.done && i.doneAt && ymd(new Date(i.doneAt)) === t).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)).map((i) => shape(i, {done: true})),
   };
@@ -79,8 +79,8 @@ if (typeof ListWidget === "undefined") {
     const enc = encodeURIComponent;
     let rows;
     try {
-      // unfinished tasks dated today or earlier, plus the most recently finished ones
-      const open = await get("items?select=id,data&" + enc("data->>date") + "=lte." + t + "&and=" + enc("(or(data->>kind.is.null,data->>kind.eq.task),or(data->>done.is.null,data->>done.eq.false))") + "&limit=500", token);
+      // unfinished tasks dated today or later, plus the most recently finished ones
+      const open = await get("items?select=id,data&" + enc("data->>date") + "=gte." + t + "&and=" + enc("(or(data->>kind.is.null,data->>kind.eq.task),or(data->>done.is.null,data->>done.eq.false))") + "&limit=500", token);
       const done = await get("items?select=id,data&" + enc("data->>done") + "=eq.true&order=server_ts.desc&limit=40", token);
       rows = open.concat(done);
     } catch (e) {
@@ -95,7 +95,7 @@ if (typeof ListWidget === "undefined") {
   const INK = Color.dynamic(new Color("#111111"), new Color("#f0f0f0"));
   const PAPER = Color.dynamic(new Color("#ffffff"), new Color("#0f0f0f"));
   const MUTED = Color.dynamic(new Color("#6c6c6c"), new Color("#9b9b9b"));
-  const ALERT = Color.dynamic(new Color("#d0352b"), new Color("#ff6d61"));
+  const tomorrow = ymd(new Date(Date.now() + 86400000));
 
   function row(w, it, big) {
     const s = w.addStack();
@@ -113,9 +113,9 @@ if (typeof ListWidget === "undefined") {
     tt.font = Font.systemFont(big ? 14.5 : 13); tt.lineLimit = 1;
     tt.textColor = it.done ? MUTED : INK;
     s.addSpacer();
-    if (it.late) {
-      const d = s.addText(Number(it.date.slice(5, 7)) + "/" + Number(it.date.slice(8, 10)));
-      d.font = Font.systemFont(10.5); d.textColor = ALERT; d.lineLimit = 1;
+    if (it.later) {
+      const d = s.addText(it.date === tomorrow ? "내일" : Number(it.date.slice(5, 7)) + "/" + Number(it.date.slice(8, 10)));
+      d.font = Font.systemFont(10.5); d.textColor = MUTED; d.lineLimit = 1;
     }
     if (it.color && !it.done) {
       const dot = s.addStack();
@@ -143,7 +143,7 @@ if (typeof ListWidget === "undefined") {
     wd.font = Font.mediumSystemFont(big ? 12 : 11); wd.textColor = MUTED;
     head.addSpacer();
     if (data) {
-      const left = data.late.length + data.today.length;
+      const left = data.today.length;
       const n = head.addText(left ? "남은 일 " + left : data.done.length ? "모두 완료" : "");
       n.font = Font.semiboldSystemFont(big ? 12 : 11); n.textColor = left ? INK : MUTED;
     }
@@ -157,9 +157,11 @@ if (typeof ListWidget === "undefined") {
       w.addSpacer();
       return w;
     }
-    const open = data.late.concat(data.today);
+    // today first, then finished today, then what is coming up
+    const open = data.today;
     let list = open.slice(0, max);
     if (list.length < max) list = list.concat(data.done.slice(0, max - list.length));
+    if (list.length < max) list = list.concat((data.later || []).slice(0, max - list.length));
     const hidden = open.length - Math.min(open.length, max);
     if (!list.length) {
       const m = w.addText("오늘 할 일 없음");
@@ -198,7 +200,7 @@ if (typeof ListWidget === "undefined") {
     if (data) { try { fm.writeString(cachePath, JSON.stringify({t, data})); } catch (e) {} }
     else if (fm.fileExists(cachePath)) {
       // offline: show the last list we saw today
-      try { const c = JSON.parse(fm.readString(cachePath)); if (c.t === t) { data = c.data; note = "오프라인"; } } catch (e) {}
+      try { const c = JSON.parse(fm.readString(cachePath)); if (c.t === t && c.data.later) { data = c.data; note = "오프라인"; } } catch (e) {}
     }
     widget = build(data, data ? note : ok ? "불러오지 못했어요. 인터넷 연결을 확인해 주세요" : "로그인이 필요해요");
   }
