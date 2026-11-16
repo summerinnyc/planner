@@ -247,6 +247,7 @@ body.has-timer .toast{bottom:86px}
 .ts-stop:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 /* ---------- calendar ---------- */
 .tabbar{display:none}
+.segbar{display:none}
 body[data-section="timer"] .cats,body[data-section="diary"] .cats,body[data-section="routine"] .cats,body[data-section="goal"] .cats{display:none!important}
 .cal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:2px 0 12px}
 .cal-nav{display:flex;align-items:center;gap:4px}
@@ -695,6 +696,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   aside > .cats{order:3}
   #banner{order:4}
   h2.view{order:5}
+  .segbar{order:5}
   form.add{order:6}
   .listbar{order:7}
   #content{order:8}
@@ -721,8 +723,15 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   nav.views button[data-view="timer"]{display:none}
   nav.views button[data-view="diary"]{display:none}
   nav.views button[data-view="study"]{display:none}
+  /* switch inside a merged tab */
+  .segbar:not([hidden]){display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;margin:10px 0 18px;padding:4px;background:var(--cover-empty);border-radius:14px}
+  .segbar button{border:0;background:transparent;color:var(--muted);font-size:15px;font-weight:600;padding:11px 4px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:6px}
+  .segbar button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .segbar .n{font-size:12px;opacity:.75}
+  body[data-group="plan"] #viewTitle,body[data-group="learn"] #viewTitle{display:none}
+  .gl-page>.gl-tabs{display:none}
   /* bottom tab bar */
-  .tabbar{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:25;grid-template-columns:repeat(7,1fr);
+  .tabbar{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:25;grid-template-columns:repeat(5,1fr);
     padding:6px max(6px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
     background:color-mix(in srgb, var(--paper) 90%, transparent);-webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);border-top:1px solid var(--line)}
   .tabbar button{position:relative;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 0 2px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:10.5px;font-weight:500;cursor:pointer}
@@ -895,6 +904,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     </div>
     <div class="banner" id="banner"></div>
     <h2 class="view" id="viewTitle">오늘</h2>
+    <div class="segbar" id="segbar" hidden></div>
 
     <form class="add" id="addForm" autocomplete="off">
       <div class="catpick" id="catPick" role="group" aria-label="카테고리 선택"></div>
@@ -952,12 +962,10 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
 
 <nav class="tabbar" id="tabbar" aria-label="메뉴">
   <button type="button" data-tab="todo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.3 12.2 2.6 2.6 5-5.6"/></svg><span>할 일</span></button>
-  <button type="button" data-tab="routine"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2.5l3 3-3 3"/><path d="M4 11.5V10a4.5 4.5 0 0 1 4.5-4.5H20"/><path d="M7 21.5l-3-3 3-3"/><path d="M20 12.5V14a4.5 4.5 0 0 1-4.5 4.5H4"/></svg><span>루틴</span><span class="n" data-count="routine"></span></button>
-  <button type="button" data-tab="goal"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 21V4"/><path d="M5.5 4.5h11l-2 3.75 2 3.75h-11"/></svg><span>목표</span><span class="n" data-count="goal"></span></button>
   <button type="button" data-tab="calendar"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>캘린더</span></button>
+  <button type="button" data-tab="plan"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 21V4"/><path d="M5.5 4.5h11l-2 3.75 2 3.75h-11"/></svg><span>계획</span><span class="n" data-count="routine"></span></button>
+  <button type="button" data-tab="learn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg><span>공부</span></button>
   <button type="button" data-tab="diary"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h10.5A1.5 1.5 0 0 1 18 5v15.5H7A2 2 0 0 1 5 18.5v-13a2 2 0 0 1 1-2z"/><path d="M5 18.5A2 2 0 0 1 7 16.5h11"/><path d="M9 8h5.5M9 11.5h4"/></svg><span>일기</span></button>
-  <button type="button" data-tab="timer"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M12 2.5V5"/></svg><span>타이머</span></button>
-  <button type="button" data-tab="study"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg><span>학습</span></button>
 </nav>
 
 <div class="modal" id="ttModal" hidden>
@@ -1033,6 +1041,8 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   const SETTINGS_ID = "__settings";
   const WD = "일월화수목금토", WD_EN = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
   const VIEWS = {today:"오늘", upcoming:"예정", someday:"언젠가", calendar:"캘린더", study:"학습", routine:"루틴", goal:"목표·고민", diary:"일기", timer:"타이머", done:"완료", trash:"휴지통"};
+  const GROUPS = {plan: [["routine", "루틴"], ["goal:goals", "목표"], ["goal:decisions", "고민"]], learn: [["timer", "타이머"], ["study", "학습"]]};
+  const GROUP_OF = {routine: "plan", goal: "plan", timer: "learn", study: "learn"};
   const TODO_VIEWS = ["today", "upcoming", "someday", "done", "trash"];
   const SORTS = {datetime:"날짜·시간순", due:"마감 임박순", created:"등록순", manual:"직접 정렬"};
   const REMIND = [["", "없음"], ["0", "정각"], ["5", "5분 전"], ["10", "10분 전"], ["30", "30분 전"], ["60", "1시간 전"], ["1440", "하루 전"]];
@@ -1461,7 +1471,17 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     $("#listbar").hidden = (view === "done" || view === "trash" || view === "routine" || view === "goal" || special);
     document.body.dataset.section = special ? view : "todo";
     $("#viewTitle").hidden = view === "calendar";
-    document.querySelectorAll("#tabbar [data-tab]").forEach((t) => t.setAttribute("aria-current", String(t.dataset.tab === document.body.dataset.section)));
+    const tabGroup = GROUP_OF[view] || (special ? view : "todo");
+    document.body.dataset.group = tabGroup;
+    document.querySelectorAll("#tabbar [data-tab]").forEach((t) => t.setAttribute("aria-current", String(t.dataset.tab === tabGroup)));
+    const seg = $("#segbar");
+    seg.hidden = !GROUPS[tabGroup];
+    if (GROUPS[tabGroup]) {
+      const openDc = decisions().filter((d) => d.status !== "decided").length, left = routinesLeftToday();
+      const n = {routine: left, "goal:decisions": openDc};
+      seg.innerHTML = GROUPS[tabGroup].map(([k, l]) => { const on = k.split(":")[0] === view && (!k.includes(":") || k.split(":")[1] === glTab);
+        return '<button type="button" data-seg="' + k + '" aria-pressed="' + on + '">' + l + (n[k] ? '<span class="n">' + n[k] + "</span>" : "") + "</button>"; }).join("");
+    }
 
     const counts = {routine: routinesLeftToday(), goal: decisions().filter((d) => d.status !== "decided").length,today: b.late.length + b.today.length, upcoming: b.upcoming.length, someday: b.someday.length, done: b.done.length, trash: b.trash.length};
     document.querySelectorAll("[data-count]").forEach((el) => { const n = counts[el.dataset.count]; el.textContent = n ? n : ""; });
@@ -3513,10 +3533,19 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   }
   $("#nav").addEventListener("click", (e) => { const b = e.target.closest("[data-view]"); if (b) go(b.dataset.view); });
   let lastTodoView = TODO_VIEWS.includes(view) ? view : "today";
+  const lastIn = {plan: "routine", learn: "timer"};
+  $("#segbar").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-seg]"); if (!b) return;
+    const [v, sub] = b.dataset.seg.split(":");
+    if (sub) { glTab = sub; glOpen = null; }
+    if (v === view) render(); else go(v);
+  });
   $("#tabbar").addEventListener("click", (e) => {
     const b = e.target.closest("[data-tab]"); if (!b) return;
     const t = b.dataset.tab;
+    if (GROUP_OF[view]) lastIn[GROUP_OF[view]] = view;
     if (t === "todo") go(TODO_VIEWS.includes(view) ? view : lastTodoView);
+    else if (GROUPS[t]) { if (GROUP_OF[view] !== t) { if (TODO_VIEWS.includes(view)) lastTodoView = view; go(lastIn[t]); } }
     else if (view !== t) { if (TODO_VIEWS.includes(view)) lastTodoView = view; go(t); }
     window.scrollTo(0, 0);
   });
