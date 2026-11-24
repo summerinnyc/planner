@@ -533,6 +533,24 @@ textarea.gl-note:focus{border-color:var(--ink)}
 .gl-nudge button span{font-family:var(--font-num);font-size:12px;border:1px solid var(--ink);border-radius:999px;padding:1px 8px;white-space:nowrap}
 .rt-form input[type="date"]{border:0;border-bottom:1.5px solid var(--line);background:transparent;padding:6px 2px;font-size:15px;color:var(--ink);outline:none}
 .rt-form textarea{border:1px solid var(--line);background:transparent;padding:8px 10px;font-size:15px;color:var(--ink);outline:none;min-height:64px;resize:vertical}
+/* to do within a period (할 것) */
+.lt-add{display:flex;flex-direction:column;gap:10px;margin:0 0 6px}
+.lt-row{display:flex;gap:8px;align-items:center}
+.lt-row .pill{flex:none}
+.lt-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.lt-item{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line)}
+.lt-item:first-child{border-top:0}
+.lt-item .tx{font-size:15px;line-height:1.4;overflow-wrap:anywhere;word-break:keep-all;cursor:pointer;border:0;background:transparent;text-align:left;padding:0;color:var(--ink)}
+.lt-item.done .tx{color:var(--muted);text-decoration:line-through}
+.lt-tag{font-size:12px;color:var(--muted);white-space:nowrap;display:flex;gap:6px;align-items:center}
+.lt-tag b{color:var(--ink)}
+.lt-tag.late{color:var(--alert)}
+.lt-dates{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.lt-dates label{display:flex;gap:6px;align-items:center}
+.lt-move{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.lt-move .lt-row{flex-wrap:wrap}
+.rc-more{border:0;background:transparent;color:var(--muted);font-size:12.5px;padding:6px 0 0;text-align:left;cursor:pointer}
+.rc-item .lt-tag{justify-self:end}
 .rt-form{display:flex;flex-direction:column;gap:12px}
 .rt-form label.blk2{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
 .rt-form input[type="text"]{border:0;border-bottom:1.5px solid var(--line);background:transparent;padding:6px 2px;font-size:15px;color:var(--ink);outline:none}
@@ -1041,7 +1059,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   const SETTINGS_ID = "__settings";
   const WD = "일월화수목금토", WD_EN = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
   const VIEWS = {today:"오늘", upcoming:"예정", someday:"언젠가", calendar:"캘린더", study:"학습", routine:"루틴", goal:"목표·고민", diary:"일기", timer:"타이머", done:"완료", trash:"휴지통"};
-  const GROUPS = {plan: [["routine", "루틴"], ["goal:goals", "목표"], ["goal:decisions", "고민"]], learn: [["timer", "타이머"], ["study", "학습"]]};
+  const GROUPS = {plan: [["routine", "루틴"], ["goal:later", "할 것"], ["goal:goals", "목표"], ["goal:decisions", "고민"]], learn: [["timer", "타이머"], ["study", "학습"]]};
   const GROUP_OF = {routine: "plan", goal: "plan", timer: "learn", study: "learn"};
   const TODO_VIEWS = ["today", "upcoming", "someday", "done", "trash"];
   const SORTS = {datetime:"날짜·시간순", due:"마감 임박순", created:"등록순", manual:"직접 정렬"};
@@ -1436,7 +1454,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     } else if (view === "study") {
       html = studyHTML();
     } else if (view === "today") {
-      html = routineCardHTML() + decisionNudgeHTML() + todayClassesHTML() + group("지난 일", b.late, "late", true) + group("남은 일", b.today) + group("오늘 완료", b.doneToday);
+      html = routineCardHTML() + laterCardHTML() + decisionNudgeHTML() + todayClassesHTML() + group("지난 일", b.late, "late", true) + group("남은 일", b.today) + group("오늘 완료", b.doneToday);
       if (!html) html = empty("없음");
     } else if (view === "upcoming") {
       if (settings.sort === "datetime") {
@@ -1478,12 +1496,12 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     seg.hidden = !GROUPS[tabGroup];
     if (GROUPS[tabGroup]) {
       const openDc = decisions().filter((d) => d.status !== "decided").length, left = routinesLeftToday();
-      const n = {routine: left, "goal:decisions": openDc};
+      const n = {routine: left, "goal:decisions": openDc, "goal:later": laterNow().length};
       seg.innerHTML = GROUPS[tabGroup].map(([k, l]) => { const on = k.split(":")[0] === view && (!k.includes(":") || k.split(":")[1] === glTab);
         return '<button type="button" data-seg="' + k + '" aria-pressed="' + on + '">' + l + (n[k] ? '<span class="n">' + n[k] + "</span>" : "") + "</button>"; }).join("");
     }
 
-    const counts = {routine: routinesLeftToday(), goal: decisions().filter((d) => d.status !== "decided").length,today: b.late.length + b.today.length, upcoming: b.upcoming.length, someday: b.someday.length, done: b.done.length, trash: b.trash.length};
+    const counts = {routine: routinesLeftToday(), goal: decisions().filter((d) => d.status !== "decided").length + laterNow().length,today: b.late.length + b.today.length, upcoming: b.upcoming.length, someday: b.someday.length, done: b.done.length, trash: b.trash.length};
     document.querySelectorAll("[data-count]").forEach((el) => { const n = counts[el.dataset.count]; el.textContent = n ? n : ""; });
     document.querySelectorAll("#nav button").forEach((btn) => btn.setAttribute("aria-current", btn.dataset.view === view ? "true" : "false"));
     renderCats();
@@ -2558,7 +2576,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   let rtDraft = null, finderPicks = new Set();
   const activeCount = () => routines().filter((r) => !r.paused).length;
   function openRtModal(title, html){ $("#rtTitle").textContent = title; $("#rtBody").innerHTML = html; $("#rtModal").hidden = false; }
-  function closeRtModal(){ $("#rtModal").hidden = true; rtDraft = null; glDraft = null; render(); }
+  function closeRtModal(){ $("#rtModal").hidden = true; rtDraft = null; glDraft = null; ltDraft = null; render(); }
   function openFinder(){
     const rows = () => {
       const picks = [...finderPicks];
@@ -2624,7 +2642,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   });
   $("#rtModal").addEventListener("submit", (e) => {
     e.preventDefault();
-    if (e.target.id === "glForm" || e.target.id === "dcForm") return;
+    if (e.target.id === "glForm" || e.target.id === "dcForm" || e.target.id === "ltForm") return;
     const f = e.target.elements;
     if (e.target.id === "qtForm") {
       commit(newId("q"), {kind: "quit", title: f.title.value.trim(), instead: f.instead.value.trim(), trigger: f.trigger.value.trim(), log: {}, createdAt: Date.now(), deleted: false});
@@ -2707,8 +2725,9 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
   }
   function goalPageHTML(){
     const gs = goals(), ds = decisions(), openDs = ds.filter((d) => d.status !== "decided");
-    let h = '<div class="rt-page gl-page"><div class="gl-tabs"><button type="button" class="cal-btn" data-glp="tab" data-tab="goals" aria-pressed="' + (glTab === "goals") + '">목표</button><button type="button" class="cal-btn" data-glp="tab" data-tab="decisions" aria-pressed="' + (glTab === "decisions") + '">고민' + (openDs.length ? " " + openDs.length : "") + "</button></div>";
+    let h = '<div class="rt-page gl-page"><div class="gl-tabs"><button type="button" class="cal-btn" data-glp="tab" data-tab="later" aria-pressed="' + (glTab === "later") + '">할 것' + (laterNow().length ? " " + laterNow().length : "") + '</button><button type="button" class="cal-btn" data-glp="tab" data-tab="goals" aria-pressed="' + (glTab === "goals") + '">목표</button><button type="button" class="cal-btn" data-glp="tab" data-tab="decisions" aria-pressed="' + (glTab === "decisions") + '">고민' + (openDs.length ? " " + openDs.length : "") + "</button></div>";
     const sec = (title, list, btn, emptyMsg, fn) => '<section class="st-sec" style="margin:0"><div class="st-head"><h3>' + title + "</h3>" + (btn || "") + '</div><div style="display:flex;flex-direction:column;gap:10px">' + (list.length ? list.map(fn).join("") : emptyMsg ? '<div class="empty">' + emptyMsg + "</div>" : "") + "</div></section>";
+    if (glTab === "later") return h + laterPageHTML() + "</div>";
     if (glTab === "goals") {
       const by = (st) => gs.filter((g) => (g.status || "idea") === st);
       h += sec("진행 중", by("doing").sort((a, b) => (a.date || "9999").localeCompare(b.date || "9999")), '<button type="button" class="cal-btn" data-glp="new-goal" data-status="doing">+ 추가</button>', "없음", goalCardHTML);
@@ -2830,6 +2849,7 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
     const now = Date.now();
     if (e.target.id === "glForm") {
       const data = {title, when: f.when.value.trim(), date: f.date.value || "", why: f.why.value.trim(), status: glDraft.status, routineIds: glDraft.routineIds};
+      if (glDraft.fromLater && items.get(glDraft.fromLater)) glUpd(glDraft.fromLater, {deleted: true});
       if (glDraft.id) glUpd(glDraft.id, data);
       else { const id = newId("g"); commit(id, Object.assign({kind: "goal", steps: [], createdAt: now, deleted: false, doneAt: null}, data)); glOpen = id; }
       glTab = "goals";
@@ -2843,6 +2863,225 @@ label.linkbtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-eve
       glTab = "decisions";
     }
     glDraft = null; closeRtModal();
+  });
+
+  // ================= to do within a period (할 것) =================
+  // later: {kind:"later", title, period:{type, label, start, end}, done, doneAt}
+  function laterItems(){ return allKind("later").filter((x) => !x.deleted).sort(byCreated); }
+  const monthEnd = (y, m) => ymd(new Date(y, m, 0));
+  function termRange(t, which){
+    const ts = validTerms().filter((x) => x.start && x.end).sort((a, b) => a.start.localeCompare(b.start));
+    if (!ts.length) return null;
+    const cur = ts.find((x) => t >= x.start && t <= x.end), next = ts.find((x) => x.start > t);
+    if (which === "term") { const x = cur || next; return x ? {start: x.start, end: x.end} : null; }
+    if (cur) { const after = ts.find((x) => x.start > cur.end); return {start: addDays(cur.end, 1), end: after ? addDays(after.start, -1) : ""}; }
+    const prev = ts.filter((x) => x.end < t).pop();
+    return {start: prev ? addDays(prev.end, 1) : t, end: next ? addDays(next.start, -1) : ""};
+  }
+  function monthPeriod(y, m, part, t){
+    const thisYear = Number(t.slice(0, 4));
+    const label = (y !== thisYear ? (y === thisYear + 1 ? "내년 " : String(y).slice(2) + "년 ") : "") + m + "월" + (part === "초" ? " 초" : part === "말" ? " 말" : "");
+    const s0 = y + "-" + pad2(m) + "-01", e0 = monthEnd(y, m);
+    return {type: "month", label, start: part === "말" ? y + "-" + pad2(m) + "-21" : s0, end: part === "초" ? y + "-" + pad2(m) + "-10" : e0};
+  }
+  const pad2 = (n) => String(n).padStart(2, "0");
+  function presetPeriod(key, t){
+    t = t || today();
+    const y = Number(t.slice(0, 4)), m = Number(t.slice(5, 7));
+    if (key === "week") { const ws = weekStart(t); return {type: "week", label: "", start: ws, end: addDays(ws, 6)}; }
+    if (key === "nextweek") { const ws = addDays(weekStart(t), 7); return {type: "week", label: "", start: ws, end: addDays(ws, 6)}; }
+    if (key === "month") return monthPeriod(y, m, "", t);
+    if (key === "nextmonth") return monthPeriod(m === 12 ? y + 1 : y, m === 12 ? 1 : m + 1, "", t);
+    if (key === "break" || key === "term") { const r = termRange(t, key) || {start: "", end: ""}; return {type: key, label: key === "break" ? "방학" : "학기 중", start: r.start, end: r.end}; }
+    return {type: "someday", label: "언젠가", start: "", end: ""};
+  }
+  // "12월 근로장학 신청하기", "방학 - 장학금 알아보기", "~12/5 서류 내기"
+  function parsePeriod(text, t){
+    t = t || today();
+    const y = Number(t.slice(0, 4)), cm = Number(t.slice(5, 7));
+    const rules = [
+      [/^(내년\s*)?(\d{1,2})\s*월\s*(초|말)?(\s*(내|안에|안|중|까지|동안|에))?/, (m) => { const mm = Number(m[2]); if (mm < 1 || mm > 12) return null; const yy = m[1] ? y + 1 : mm < cm ? y + 1 : y; return monthPeriod(yy, mm, m[3] || "", t); }],
+      [/^이번\s*주(\s*(내|안에|안|중|까지|동안))?/, () => presetPeriod("week", t)],
+      [/^다음\s*주(\s*(내|안에|안|중|까지|동안))?/, () => presetPeriod("nextweek", t)],
+      [/^이번\s*달(\s*(내|안에|안|중|까지|동안))?/, () => presetPeriod("month", t)],
+      [/^다음\s*달(\s*(내|안에|안|중|까지|동안))?/, () => presetPeriod("nextmonth", t)],
+      [/^(이번\s*|겨울\s*|여름\s*)?방학(\s*(때|중|동안|에|내|안에)(?=\s)|\s*[-–—·:,|>])/, () => presetPeriod("break", t)],
+      [/^(이번\s*)?학기(\s*(중|내|안에|동안|때)(?=\s)|\s*[-–—·:,|>])/, () => presetPeriod("term", t)],
+      [/^언젠가/, () => presetPeriod("someday", t)],
+      [/^(\d{1,2})[\/.](\d{1,2})\s*[~∼-]\s*(\d{1,2})[\/.](\d{1,2})/, (m) => { const a = fixYear(m[1], m[2], t), b = fixYear(m[3], m[4], t, a); return a && b ? {type: "range", label: "", start: a, end: b} : null; }],
+      [/^[~∼]\s*(\d{1,2})[\/.](\d{1,2})(\s*(까지))?/, (m) => { const b = fixYear(m[1], m[2], t); return b ? {type: "range", label: "", start: t, end: b} : null; }],
+      [/^(\d{1,2})[\/.](\d{1,2})\s*까지/, (m) => { const b = fixYear(m[1], m[2], t); return b ? {type: "range", label: "", start: t, end: b} : null; }],
+    ];
+    const src = text.replace(/^\s+/, "");
+    for (const [re, fn] of rules) {
+      const m = src.match(re); if (!m) continue;
+      const p = fn(m); if (!p) continue;
+      const rest = src.slice(m[0].length).replace(/^\s*[-–—·:,|>]*\s*/, "");
+      if (!rest) continue;
+      return {period: p, rest};
+    }
+    return null;
+  }
+  function fixYear(mo, da, t, after){
+    mo = Number(mo); da = Number(da);
+    if (mo < 1 || mo > 12 || da < 1 || da > 31) return null;
+    let y = Number(t.slice(0, 4)), d = y + "-" + pad2(mo) + "-" + pad2(da);
+    if (d < (after || addDays(t, -31))) d = (y + 1) + "-" + pad2(mo) + "-" + pad2(da);
+    return d;
+  }
+  const shortD = (d) => Number(d.slice(5, 7)) + "/" + Number(d.slice(8, 10));
+  function periodLabel(p){
+    if (!p) return "언젠가";
+    const t = today();
+    if (p.type === "week" && p.start) { const ws = weekStart(t); return p.start === ws ? "이번 주" : p.start === addDays(ws, 7) ? "다음 주" : shortD(p.start) + " 주"; }
+    if (p.type === "month" && p.start && p.end && p.start.slice(0, 7) === t.slice(0, 7) && p.start.slice(8) === "01" && p.end === monthEnd(Number(t.slice(0, 4)), Number(t.slice(5, 7)))) return "이번 달";
+    if (p.label) return p.label;
+    if (p.start && p.end) return (p.start === today() ? "" : shortD(p.start)) + "~" + shortD(p.end);
+    return p.end ? "~" + shortD(p.end) : p.start ? shortD(p.start) + "~" : "언젠가";
+  }
+  // break/term chosen before semesters existed: fill dates in once they do
+  function laterRange(x){
+    const p = x.period || {};
+    if ((p.type === "break" || p.type === "term") && !p.start && !p.end) {
+      const r = termRange(ymd(new Date(x.createdAt || Date.now())), p.type) || termRange(today(), p.type);
+      if (r) return r;
+    }
+    return {start: p.start || "", end: p.end || ""};
+  }
+  function laterState(x, t){
+    t = t || today();
+    const r = laterRange(x);
+    if (!r.start && !r.end) return "someday";
+    if (r.end && r.end < t) return "late";
+    if (r.start && r.start > t) return "soon";
+    return "now";
+  }
+  const laterSort = (a, b) => { const ra = laterRange(a), rb = laterRange(b); return (ra.end || "9999").localeCompare(rb.end || "9999") || (ra.start || "").localeCompare(rb.start || "") || byCreated(a, b); };
+  function laterNow(){ const t = today(); return laterItems().filter((x) => !x.done && (laterState(x, t) === "now" || laterState(x, t) === "late")); }
+  function laterTagHTML(x){
+    const st = laterState(x), r = laterRange(x), lbl = esc(periodLabel(x.period));
+    if (x.done) return '<span class="lt-tag">' + lbl + "</span>";
+    if (st === "late") return '<span class="lt-tag late">' + lbl + " · 기간 지남</span>";
+    if (st === "soon") return '<span class="lt-tag">' + lbl + " · " + shortD(r.start) + "부터</span>";
+    if (st === "now" && r.end) { const n = diffDays(r.end, today()); if (n <= 7) return '<span class="lt-tag">' + lbl + " · <b>" + (n === 0 ? "오늘까지" : "D-" + n) + "</b></span>"; }
+    return '<span class="lt-tag">' + lbl + "</span>";
+  }
+  function laterRowHTML(x){
+    return '<li class="lt-item' + (x.done ? " done" : "") + '" data-lt="' + esc(x.id) + '"><button type="button" class="gl-chk" data-ltp="chk" aria-pressed="' + !!x.done + '" aria-label="완료"></button>' +
+      '<button type="button" class="tx" data-ltp="edit">' + esc(x.title) + "</button>" + laterTagHTML(x) + "</li>";
+  }
+  const LT_CHIPS = () => { const t = today(), nm = Number(t.slice(5, 7)) % 12 + 1; return [["week", "이번 주"], ["month", "이번 달"], ["nextmonth", nm + "월"], ["break", "방학"], ["someday", "언젠가"]]; };
+  let ltPick = "someday";
+  function laterPageHTML(){
+    const t = today(), all = laterItems(), open = all.filter((x) => !x.done);
+    const by = (st) => open.filter((x) => laterState(x, t) === st).sort(laterSort);
+    const now = by("late").concat(by("now")), soon = by("soon"), some = by("someday");
+    const done = all.filter((x) => x.done && x.doneAt && Date.now() - x.doneAt < 30 * 864e5).sort((a, b) => b.doneAt - a.doneAt);
+    let h = '<section class="st-sec" style="margin:0"><div class="lt-add"><div class="lt-row"><span class="pill" id="ltPill" hidden></span><input type="text" class="gl-in" id="ltIn" placeholder="예: 12월 근로장학 신청하기" enterkeyhint="done" autocomplete="off"><button type="button" class="gl-plus" data-ltp="add" aria-label="추가">+</button></div>' +
+      '<div class="gl-chips" id="ltChips">' + LT_CHIPS().map(([k, l]) => '<button type="button" data-ltp="pick" data-k="' + k + '" aria-pressed="' + (ltPick === k) + '">' + l + "</button>").join("") + "</div></div></section>";
+    const sec = (title, list) => list.length ? '<section class="st-sec" style="margin:0"><div class="st-head"><h3>' + title + '</h3></div><ul class="lt-list">' + list.map(laterRowHTML).join("") + "</ul></section>" : "";
+    h += sec("지금 할 것", now) + sec("곧 시작", soon) + sec("언젠가", some) + sec("완료", done);
+    if (!open.length && !done.length) h += '<div class="empty">없음</div>';
+    return h;
+  }
+  function laterCardHTML(){
+    const late = (x) => laterState(x) === "late" ? 0 : 1;
+    const l = laterNow().sort((a, b) => late(a) - late(b) || laterSort(a, b));
+    if (!l.length) return "";
+    const show = l.slice(0, 3);
+    return '<section class="rc"><div class="rc-head"><b>기간 안에 할 것</b><span>' + l.length + "</span></div>" +
+      '<ul class="rc-list">' + show.map((x) => '<li class="rc-item" data-lt="' + esc(x.id) + '"><button type="button" class="rc-check" data-ltp="chk" aria-label="' + esc(x.title) + ' 완료">' + CHECK_SVG + '</button><div class="rc-main" data-ltp="open"><span class="rc-title">' + esc(x.title) + "</span></div>" + laterTagHTML(x) + "</li>").join("") + "</ul>" +
+      (l.length > show.length ? '<button type="button" class="rc-more" data-ltp="open">+' + (l.length - show.length) + "개 더</button>" : "") + "</section>";
+  }
+  function addLater(){
+    const inp = $("#ltIn"); if (!inp) return;
+    const raw = inp.value.trim(); if (!raw) { inp.focus(); return; }
+    const pr = parsePeriod(raw);
+    const period = pr ? pr.period : presetPeriod(ltPick);
+    const now = Date.now();
+    commit(newId("l"), {kind: "later", title: pr ? pr.rest : raw, period, done: false, doneAt: null, deleted: false, createdAt: now});
+    render();
+    const again = $("#ltIn"); if (again) again.focus({preventScroll: true});
+  }
+  function syncLtPill(){
+    const inp = $("#ltIn"), pill = $("#ltPill"); if (!inp || !pill) return;
+    const pr = parsePeriod(inp.value);
+    pill.hidden = !pr; if (pr) pill.textContent = periodLabel(pr.period);
+    document.querySelectorAll("#ltChips [data-k]").forEach((c) => c.setAttribute("aria-pressed", String(!pr && c.dataset.k === ltPick)));
+  }
+  content.addEventListener("input", (e) => { if (e.target.id === "ltIn") syncLtPill(); });
+  content.addEventListener("keydown", (e) => {
+    if (e.target.id !== "ltIn" || e.key !== "Enter" || e.isComposing || e.keyCode === 229) return;
+    e.preventDefault(); addLater();
+  });
+  let ltDraft = null;
+  content.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-ltp]"); if (!b) return;
+    const a = b.dataset.ltp;
+    if (a === "add") { addLater(); return; }
+    if (a === "pick") { ltPick = b.dataset.k; syncLtPill(); const i = $("#ltIn"); if (i) i.focus({preventScroll: true}); return; }
+    if (a === "open") { glTab = "later"; glOpen = null; go("goal"); return; }
+    const row = b.closest("[data-lt]"); if (!row) return;
+    const id = row.dataset.lt, x = items.get(id); if (!x) return;
+    if (a === "chk") {
+      const was = !!x.done;
+      commit(id, Object.assign({}, x, {done: !was, doneAt: was ? null : Date.now()}));
+      if (!was) showToast("완료", "되돌리기", () => { commit(id, x); render(); });
+      render();
+    } else if (a === "edit") openLaterForm(id);
+  });
+  function ltDatesHTML(p){ return '<div class="lt-dates"><label>시작 <input type="date" name="start" value="' + esc(p.start || "") + '"></label><label>끝 <input type="date" name="end" value="' + esc(p.end || "") + '"></label></div>'; }
+  function openLaterForm(id){
+    const x = items.get(id); if (!x) return;
+    const r = laterRange(x);
+    ltDraft = {id, period: Object.assign({}, x.period || {}, r)};
+    const xp = x.period || {};
+    const k = (LT_CHIPS().find(([kk]) => { const pp = presetPeriod(kk); return pp.type === (xp.type || "someday") && (pp.type === "break" || pp.type === "someday" || (pp.start === xp.start && pp.end === xp.end)); }) || [""])[0];
+    openRtModal("할 것", '<form class="rt-form" id="ltForm" autocomplete="off">' +
+      '<label class="blk2">할 것<input type="text" name="title" value="' + esc(x.title) + '" required></label>' +
+      '<div class="gl-chips" id="ltFormChips">' + LT_CHIPS().map(([kk, l]) => '<button type="button" data-ltk="' + kk + '" aria-pressed="' + (kk === k) + '">' + l + "</button>").join("") + "</div>" +
+      ltDatesHTML(ltDraft.period) +
+      '<div class="foot"><button type="button" class="mini always danger" data-ltf="del">삭제</button><button type="button" class="mini always" data-rtf="close">취소</button><button type="submit" class="primary">저장</button></div>' +
+      '<div class="lt-move"><div class="lt-row"><input type="date" name="todo" value="' + esc(today()) + '" aria-label="할 날짜"><button type="button" class="mini always" data-ltf="todo">이 날 할 일로 옮기기</button></div>' +
+      '<div class="lt-row"><button type="button" class="mini always" data-ltf="goal">목표로 옮기기 (단계로 쪼개기)</button></div></div></form>');
+  }
+  $("#rtModal").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b || !ltDraft) return;
+    const form = $("#ltForm"); if (!form) return;
+    if (b.dataset.ltk) {
+      const p = presetPeriod(b.dataset.ltk); ltDraft.period = p;
+      form.elements.start.value = p.start; form.elements.end.value = p.end;
+      form.querySelectorAll("[data-ltk]").forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
+      return;
+    }
+    const id = ltDraft.id, x = items.get(id); if (!x) return;
+    if (b.dataset.ltf === "del") { commit(id, Object.assign({}, x, {deleted: true})); ltDraft = null; closeRtModal(); showToast("삭제됨", "되돌리기", () => { commit(id, x); render(); }); }
+    else if (b.dataset.ltf === "todo") {
+      const d = form.elements.todo.value || today(), now = Date.now();
+      commit(newId(), {kind: "task", title: form.elements.title.value.trim() || x.title, note: "", date: d, time: "", due: "", categoryId: null, remind: null, done: false, doneAt: null, deleted: false, createdAt: now, order: now, spent: 0, timerStart: null, timerGoal: null});
+      commit(id, Object.assign({}, x, {deleted: true}));
+      ltDraft = null; closeRtModal(); showToast(fmtDate(d) + " 할 일로 옮겼어요");
+    } else if (b.dataset.ltf === "goal") {
+      const title = form.elements.title.value.trim() || x.title;
+      ltDraft = null;
+      openGoalForm({title, when: periodLabel(x.period) === "언젠가" ? "" : periodLabel(x.period), date: laterRange(x).end || "", fromLater: id}, "doing");
+    }
+  });
+  $("#rtModal").addEventListener("change", (e) => {
+    if (!ltDraft || !e.target.closest("#ltForm") || (e.target.name !== "start" && e.target.name !== "end")) return;
+    ltDraft.period = {type: "range", label: "", start: e.target.form.elements.start.value, end: e.target.form.elements.end.value};
+    e.target.form.querySelectorAll("[data-ltk]").forEach((c) => c.setAttribute("aria-pressed", "false"));
+  });
+  $("#rtModal").addEventListener("submit", (e) => {
+    if (e.target.id !== "ltForm") return;
+    e.preventDefault();
+    const x = ltDraft && items.get(ltDraft.id); if (!x) return;
+    const f = e.target.elements, title = f.title.value.trim(); if (!title) return;
+    let p = ltDraft.period;
+    if (p.start > p.end && p.end) p = Object.assign({}, p, {end: p.start});
+    if (!p.start && !p.end && p.type !== "break" && p.type !== "term") p = presetPeriod("someday");
+    commit(ltDraft.id, Object.assign({}, x, {title, period: p}));
+    ltDraft = null; closeRtModal();
   });
 
   // ================= study timer =================
